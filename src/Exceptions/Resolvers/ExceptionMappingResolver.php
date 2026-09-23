@@ -1,0 +1,47 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Exceptions\Resolvers;
+
+use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+final class ExceptionMappingResolver
+{
+    /**
+     * @var ExceptionMappingDTO[]
+     */
+    private array $mappings = [];
+
+    /**
+     * @param array<string, array{code: int,type: string, loggable?: bool}> $mappingsConfig
+     */
+    public function __construct(
+        #[Autowire(param: 'exceptions')]
+        array $mappingsConfig,
+    ) {
+        foreach ($mappingsConfig as $class => $mapping) {
+            if (empty($mapping['code'])) {
+                throw new InvalidArgumentException('Missing mapping code');
+            }
+
+            $this->addMapping(
+                class: $class,
+                type: $mapping['type'],
+                code: $mapping['code'],
+                loggable: $mapping['loggable'] ?? false,
+            );
+        }
+    }
+
+    public function resolve(string $throwableClass): ?ExceptionMappingDTO
+    {
+        return array_find($this->mappings, fn($mapping, $class) => $throwableClass === $class || is_subclass_of($throwableClass, $class));
+    }
+
+    private function addMapping(string $class, string $type, int $code, bool $loggable): void
+    {
+        $this->mappings[$class] = new ExceptionMappingDTO($type, $code, $loggable);
+    }
+}
