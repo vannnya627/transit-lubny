@@ -27,9 +27,9 @@ final class Pattern
     #[ORM\Column(enumType: Direction::class)]
     public private(set) Direction $direction;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    public private(set) ?string $name = null {
-        set(?string $value) => (null !== $value && (mb_strlen($value) > 255))
+    #[ORM\Column(length: 255)]
+    public private(set) string $name {
+        set(string $value) => (mb_strlen($value) > 255)
             ? throw new InvalidArgumentException('Максимальна довжина 255 символів') : $value;
 
     }
@@ -63,7 +63,7 @@ final class Pattern
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public static function create(Route $route, Direction $direction, ?string $name = null): static
+    public static function create(Route $route, Direction $direction, string $name): static
     {
         $pattern = new self();
         $pattern->route = $route;
