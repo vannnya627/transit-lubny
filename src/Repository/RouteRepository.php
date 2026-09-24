@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Route\Pattern;
 use App\Entity\Route\Route;
+use App\Exceptions\Exception\PatternNotFoundException;
 use App\Exceptions\Exception\RouteNotFoundException;
 use App\Repository\Interfaces\RouteRepositoryInterface;
 use App\Repository\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,5 +35,15 @@ final class RouteRepository extends ServiceEntityRepository implements RouteRepo
     public function getAllRoutes(): array
     {
         return $this->findAll();
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    // TODO Можливо змінити - додати репозиторій для Patter, хоча він належить Route
+    public function getPatternById(int $patternId): Pattern
+    {
+        return $this->getEntityManager()->find(Pattern::class, $patternId) ?? throw new PatternNotFoundException($patternId);
     }
 }
