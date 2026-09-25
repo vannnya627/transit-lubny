@@ -20,4 +20,6 @@ interface StopRepositoryInterface
      * @return list<Stop>
      */
     public function findStopsBySearchQuery(SearchStopsInput $input): array;
+
+    public function getStopById(int $stopId): Stop;
 }

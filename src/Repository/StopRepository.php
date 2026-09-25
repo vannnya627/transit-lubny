@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\DTOs\Input\SearchStopsInput;
 use App\Entity\Stop;
+use App\Exceptions\Exception\StopNotFoundException;
 use App\Repository\Interfaces\StopRepositoryInterface;
 use App\Repository\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -66,5 +67,10 @@ final class StopRepository extends ServiceEntityRepository implements StopReposi
         $stops =  $qb->getQuery()->getResult();
 
         return  $stops;
+    }
+
+    public function getStopById(int $stopId): Stop
+    {
+        return $this->find($stopId) ?? throw new StopNotFoundException($stopId);
     }
 }
