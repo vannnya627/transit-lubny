@@ -7,8 +7,8 @@ namespace App\UI\API\Responses;
 final readonly class PatternWithStopsAndTripsResponse
 {
     /**
-     * @param list<StopResponse> $stops
-     * @param list<TripResponse> $trips
+     * @param list<StopForScheduleResponse> $stops
+     * @param list<TripResponse>            $trips
      */
     public function __construct(
         public int $id,

@@ -9,8 +9,8 @@ use App\Enum\Direction;
 final readonly class PatternWithStopsAndTripsDTO
 {
     /**
-     * @param list<StopDTO> $stops
-     * @param list<TripDTO> $trips
+     * @param list<StopForScheduleDTO> $stops
+     * @param list<TripDTO>            $trips
      */
     public function __construct(
         public int $id,

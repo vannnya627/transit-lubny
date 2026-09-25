@@ -10,7 +10,7 @@ use App\UI\API\Responses\PatternWithStopsAndTripsResponse;
 final readonly class PatternWithStopsAndTripsTransformer
 {
     public function __construct(
-        private StopTransformer $stopTransformer,
+        private StopForScheduleTransformer $stopForScheduleTransformer,
         private TripTransformer $tripTransformer,
     ) {}
 
@@ -20,7 +20,7 @@ final readonly class PatternWithStopsAndTripsTransformer
             id: $dto->id,
             direction: $dto->direction->getLabel(),
             name: $dto->name,
-            stops: array_map($this->stopTransformer->transform(...), $dto->stops),
+            stops: array_map($this->stopForScheduleTransformer->transform(...), $dto->stops),
             trips: array_map($this->tripTransformer->transform(...), $dto->trips),
         );
     }
