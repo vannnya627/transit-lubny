@@ -10,21 +10,21 @@ use InvalidArgumentException;
 #[ORM\Embeddable]
 final class Coordinates
 {
-    #[ORM\Column(name: 'lat', nullable: true)]
-    public private(set) ?float $lat = null {
-        set(?float $value) => (null !== $value && ($value < -90.0 || $value > 90.0))
+    #[ORM\Column(name: 'lat')]
+    public private(set) float $lat {
+        set(float $value) => ($value < -90.0 || $value > 90.0)
             ? throw new InvalidArgumentException('Широта (lat) має бути в межах від -90 до 90') : $value;
     }
 
-    #[ORM\Column(name: 'lon', nullable: true)]
-    public private(set) ?float $lon = null {
-        set(?float $value) => (null !== $value && ($value < -180.0 || $value > 180.0))
+    #[ORM\Column(name: 'lon')]
+    public private(set) float $lon {
+        set(float $value) => ($value < -180.0 || $value > 180.0)
             ? throw new InvalidArgumentException('Довгота (lon) має бути в межах від -180 до 180') : $value;
     }
 
     private function __construct() {}
 
-    public static function create(?float $lat, ?float $lon): static
+    public static function create(float $lat, float $lon): static
     {
         $coordinates = new self();
         $coordinates->lat = $lat;
