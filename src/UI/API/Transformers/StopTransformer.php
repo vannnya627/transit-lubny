@@ -12,9 +12,10 @@ final readonly class StopTransformer
     public function transform(StopDTO $dto): StopResponse
     {
         return new StopResponse(
-            sequence: $dto->sequence,
-            stopId: $dto->stopId,
+            id: $dto->id,
             name: $dto->name,
+            lat: $dto->coordinates->lat,
+            lon: $dto->coordinates->lon,
         );
     }
 }

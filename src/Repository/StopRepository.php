@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\DTOs\Input\SearchStopsInput;
 use App\Entity\Stop;
 use App\Repository\Interfaces\StopRepositoryInterface;
 use App\Repository\Traits\RepositorySupportTrait;
@@ -39,5 +40,31 @@ final class StopRepository extends ServiceEntityRepository implements StopReposi
         }
 
         return $orderedStops;
+    }
+
+    /**
+     * @return list<Stop>
+     */
+    public function findStopsBySearchQuery(SearchStopsInput $input): array
+    {
+        $qb = $this->createQueryBuilder('s');
+
+        if (null !== $input->q) {
+            $qb->andWhere('LOWER(s.name) LIKE LOWER(:q)')
+                ->setParameter('q', '%' . $input->q . '%');
+        }
+
+        if (null !== $input->coordinates) {
+
+            $qb->andWhere('ACOS(SIN(RADIANS(s.coordinates.lat)) * SIN(RADIANS(:lat)) + COS(RADIANS(s.coordinates.lat)) * COS(RADIANS(:lat)) * COS(RADIANS(s.coordinates.lon - :lon))) * 6371000 <= :radius')
+                ->setParameter('lat', $input->coordinates->lat)
+                ->setParameter('lon', $input->coordinates->lon)
+                ->setParameter('radius', $input->radius);
+        }
+
+        /** @var list<Stop> $stops */
+        $stops =  $qb->getQuery()->getResult();
+
+        return  $stops;
     }
 }
