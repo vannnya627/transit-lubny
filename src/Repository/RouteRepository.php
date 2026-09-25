@@ -46,4 +46,26 @@ final class RouteRepository extends ServiceEntityRepository implements RouteRepo
     {
         return $this->getEntityManager()->find(Pattern::class, $patternId) ?? throw new PatternNotFoundException($patternId);
     }
+
+    /**
+     * @param array<int, int> $patternIds
+     *
+     * @return list<Pattern>
+     */
+    public function findPatternsWithRoutesByIds(array $patternIds): array
+    {
+        $qb = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('p')
+            ->from(Pattern::class, 'p')
+            ->where('p.id IN (:patternIds)')
+            ->join('p.route', 'r')
+            ->addSelect('r')
+            ->setParameter('patternIds', $patternIds);
+
+        /** @var list<Pattern> $patterns */
+        $patterns = $qb->getQuery()->getResult();
+
+        return $patterns;
+    }
 }

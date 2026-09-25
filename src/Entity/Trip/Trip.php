@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use LogicException;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity]
@@ -62,5 +63,15 @@ final class Trip
         $trip->serviceDays = $serviceDays;
 
         return $trip;
+    }
+
+    public function getFirstStopTime(): StopTime
+    {
+        $stopTime = $this->stopTimes->first();
+        if (!$stopTime) {
+            throw new LogicException('У цього рейсу відсутні зупинки');
+        }
+
+        return $stopTime;
     }
 }
