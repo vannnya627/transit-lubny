@@ -16,6 +16,7 @@ final readonly class StopTransformer
             name: $dto->name,
             lat: $dto->coordinates->lat,
             lon: $dto->coordinates->lon,
+            cityCode: $dto->cityCode,
         );
     }
 }

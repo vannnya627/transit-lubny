@@ -21,6 +21,7 @@ final readonly class GetStopAction
             id: $stop->id,
             name: $stop->name,
             coordinates: $stop->coordinates,
+            cityCode: $stop->cityCode,
         );
     }
 }
