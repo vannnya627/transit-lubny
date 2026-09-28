@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UI\API\Controller;
+namespace App\UI\API\Controller\Stop;
 
 use App\Actions\Stop\GetStopDeparturesAction;
 use App\DTOs\Input\GetStopDeparturesInput;

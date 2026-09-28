@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UI\API\Controller;
+namespace App\UI\API\Controller\Route;
 
 use App\Actions\Route\GetPatternWithTripsAndStopsAction;
 use App\Exceptions\DTO\ErrorResponseDTO;

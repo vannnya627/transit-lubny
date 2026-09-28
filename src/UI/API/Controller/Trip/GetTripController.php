@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\UI\API\Controller;
+namespace App\UI\API\Controller\Trip;
 
 use App\Actions\Trip\GetTripAction;
 use App\Exceptions\DTO\ErrorResponseDTO;
 use App\UI\API\Responses\TripDetailsResponse;
 use App\UI\API\Transformers\TripDetailsTransformer;
 use Nelmio\ApiDocBundle\Attribute\Model;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use OpenApi\Attributes as OA;
 
 #[OA\Tag('Trips')]
 #[Route(path: 'api/v1/trips/{id}', name: 'api_trips', methods: ['GET'])]

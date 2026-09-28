@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\UI\API\Controller;
+namespace App\UI\API\Controller\Stop;
 
 use App\Actions\Stop\GetStopAction;
 use App\Exceptions\DTO\ErrorResponseDTO;
 use App\UI\API\Responses\StopResponse;
 use App\UI\API\Transformers\StopTransformer;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 

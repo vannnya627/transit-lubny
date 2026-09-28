@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UI\API\Controller;
+namespace App\UI\API\Controller\Stop;
 
 use App\Actions\Stop\GetStopsAction;
 use App\DTOs\Input\SearchStopsInput;
@@ -10,9 +10,9 @@ use App\UI\API\Requests\StopQueryParameter;
 use App\UI\API\Responses\StopResponse;
 use App\UI\API\Transformers\StopTransformer;
 use App\ValueObjects\Coordinates;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;

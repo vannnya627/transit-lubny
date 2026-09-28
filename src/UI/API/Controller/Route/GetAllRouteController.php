@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UI\API\Controller;
+namespace App\UI\API\Controller\Route;
 
 use App\Actions\Route\GetAllRouteAction;
 use App\UI\API\Responses\RouteResponse;
