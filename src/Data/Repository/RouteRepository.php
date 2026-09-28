@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Data\Repository;
 
-use App\Entity\Route\Pattern;
-use App\Entity\Route\Route;
+use App\Data\Entity\Route\Pattern;
+use App\Data\Entity\Route\Route;
+use App\Data\Repository\Interfaces\RouteRepositoryInterface;
+use App\Data\Repository\Traits\RepositorySupportTrait;
 use App\Exceptions\Exception\PatternNotFoundException;
 use App\Exceptions\Exception\RouteNotFoundException;
-use App\Repository\Interfaces\RouteRepositoryInterface;
-use App\Repository\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;

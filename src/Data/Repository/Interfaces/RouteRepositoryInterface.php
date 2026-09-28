@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Repository\Interfaces;
+namespace App\Data\Repository\Interfaces;
 
-use App\Entity\Route\Pattern;
-use App\Entity\Route\Route;
+use App\Data\Entity\Route\Pattern;
+use App\Data\Entity\Route\Route;
 
 interface RouteRepositoryInterface
 {

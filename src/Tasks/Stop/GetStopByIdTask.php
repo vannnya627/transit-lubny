@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tasks\Stop;
 
-use App\Entity\Stop;
-use App\Repository\Interfaces\StopRepositoryInterface;
+use App\Data\Entity\Stop;
+use App\Data\Repository\Interfaces\StopRepositoryInterface;
 
 final readonly class GetStopByIdTask
 {

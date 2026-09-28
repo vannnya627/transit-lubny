@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Repository\Interfaces;
+namespace App\Data\Repository\Interfaces;
 
+use App\Data\Entity\Stop;
 use App\DTOs\Input\SearchStopsInput;
-use App\Entity\Stop;
 
 interface StopRepositoryInterface
 {

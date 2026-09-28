@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Route;
 
+use App\Data\Entity\Route\Route;
 use App\DTOs\RouteDTO;
-use App\Entity\Route\Route;
 use App\Tasks\Route\GetAllRouteTask;
 
 final readonly class GetAllRouteAction

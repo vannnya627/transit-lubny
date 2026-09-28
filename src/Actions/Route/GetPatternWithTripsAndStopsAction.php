@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Actions\Route;
 
+use App\Data\Entity\Route\PatternStop;
+use App\Data\Entity\Stop;
+use App\Data\Entity\Trip\StopTime;
+use App\Data\Entity\Trip\Trip;
 use App\DTOs\PatternWithStopsAndTripsDTO;
 use App\DTOs\StopForScheduleDTO;
 use App\DTOs\TripDTO;
-use App\Entity\Route\PatternStop;
-use App\Entity\Stop;
-use App\Entity\Trip\StopTime;
-use App\Entity\Trip\Trip;
 use App\Tasks\Route\GetPatternByIdTask;
 use App\Tasks\Stop\FindStopsByIdsTask;
 use App\Tasks\Trip\FindTripsWithStopTimesByPatternIdTask;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Entity\Route;
+namespace App\Data\Entity\Route;
 
 use App\Enum\Direction;
 use DateTimeImmutable;

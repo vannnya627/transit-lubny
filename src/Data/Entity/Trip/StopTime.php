@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Entity\Trip;
+namespace App\Data\Entity\Trip;
 
 use Doctrine\ORM\Mapping as ORM;
 

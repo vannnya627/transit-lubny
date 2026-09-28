@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Entity\Trip;
+namespace App\Data\Entity\Trip;
 
-use App\ValueObjects\ServiceDays;
+use App\Data\ValueObjects\ServiceDays;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

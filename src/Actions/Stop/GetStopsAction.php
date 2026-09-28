@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Actions\Stop;
 
+use App\Data\Entity\Stop;
 use App\DTOs\Input\SearchStopsInput;
 use App\DTOs\StopDTO;
-use App\Entity\Stop;
 use App\Tasks\Stop\FindStopsBySearchQueryTask;
 
 final readonly class GetStopsAction

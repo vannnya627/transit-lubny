@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTOs;
 
-use App\ValueObjects\Coordinates;
+use App\Data\ValueObjects\Coordinates;
 
 final readonly class StopDTO
 {

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Data\Repository;
 
+use App\Data\Entity\Stop;
+use App\Data\Repository\Interfaces\StopRepositoryInterface;
+use App\Data\Repository\Traits\RepositorySupportTrait;
 use App\DTOs\Input\SearchStopsInput;
-use App\Entity\Stop;
 use App\Exceptions\Exception\StopNotFoundException;
-use App\Repository\Interfaces\StopRepositoryInterface;
-use App\Repository\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

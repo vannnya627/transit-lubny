@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tasks\Stop;
 
+use App\Data\Entity\Stop;
+use App\Data\Repository\Interfaces\StopRepositoryInterface;
 use App\DTOs\Input\SearchStopsInput;
-use App\Entity\Stop;
-use App\Repository\Interfaces\StopRepositoryInterface;
 
 final readonly class FindStopsBySearchQueryTask
 {

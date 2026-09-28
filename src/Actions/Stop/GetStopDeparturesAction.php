@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Actions\Stop;
 
+use App\Data\Entity\Trip\Trip;
 use App\DTOs\DepartureDTO;
 use App\DTOs\Input\GetStopDeparturesInput;
 use App\DTOs\RouteDTO;
-use App\Entity\Trip\Trip;
 use App\Tasks\Route\FindPatternsWithRoutesByIdsTask;
 use App\Tasks\Trip\FindTripsWithStopTimesForStopTask;
 

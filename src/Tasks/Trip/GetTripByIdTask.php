@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tasks\Trip;
 
-use App\Entity\Trip\Trip;
-use App\Repository\Interfaces\TripRepositoryInterface;
+use App\Data\Entity\Trip\Trip;
+use App\Data\Repository\Interfaces\TripRepositoryInterface;
 
 final readonly class GetTripByIdTask
 {

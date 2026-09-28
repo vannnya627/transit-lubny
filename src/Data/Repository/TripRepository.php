@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Data\Repository;
 
+use App\Data\Entity\Trip\Trip;
+use App\Data\Repository\Interfaces\TripRepositoryInterface;
+use App\Data\Repository\Traits\RepositorySupportTrait;
 use App\DTOs\Input\GetStopDeparturesInput;
-use App\Entity\Trip\Trip;
 use App\Exceptions\Exception\TripNotFoundException;
-use App\Repository\Interfaces\TripRepositoryInterface;
-use App\Repository\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

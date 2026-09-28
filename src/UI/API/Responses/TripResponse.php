@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\API\Responses;
 
-use App\ValueObjects\ServiceDays;
+use App\Data\ValueObjects\ServiceDays;
 
 final readonly class TripResponse
 {

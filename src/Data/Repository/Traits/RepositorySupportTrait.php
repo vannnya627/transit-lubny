@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Repository\Traits;
+namespace App\Data\Repository\Traits;
 
 use Throwable;
 

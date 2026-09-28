@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tasks\Trip;
 
+use App\Data\Entity\Trip\Trip;
+use App\Data\Repository\Interfaces\TripRepositoryInterface;
 use App\DTOs\Input\GetStopDeparturesInput;
-use App\Entity\Trip\Trip;
-use App\Repository\Interfaces\TripRepositoryInterface;
 
 final readonly class FindTripsWithStopTimesForStopTask
 {

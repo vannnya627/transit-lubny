@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTOs;
 
-use App\ValueObjects\ServiceDays;
+use App\Data\ValueObjects\ServiceDays;
 
 final readonly class TripDTO
 {

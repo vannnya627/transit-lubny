@@ -2,40 +2,34 @@
 
 declare(strict_types=1);
 
-namespace App\Entity\Route;
+namespace App\Data\Entity;
 
+use App\Data\ValueObjects\Coordinates;
 use DateTimeImmutable;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity]
-final class Route
+final class Stop
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     public private(set) int $id;
+
     #[ORM\Column(length: 255)]
-    public private(set) string $shortName {
+    public private(set) string $name {
         set(string $value) => (mb_strlen($value) > 255)
             ? throw new InvalidArgumentException('Максимальна довжина 255 символів') : $value;
 
     }
 
-    #[ORM\Column(length: 255)]
-    public private(set) string $longName {
-        set(string $value) => (mb_strlen($value) > 255)
-            ? throw new InvalidArgumentException('Максимальна довжина 255 символів') : $value;
-    }
+    #[ORM\Embedded(class: Coordinates::class, columnPrefix: false)]
+    public private(set) Coordinates $coordinates;
 
-    /**
-     * @var Collection<int, Pattern>
-     */
-    #[ORM\OneToMany(targetEntity: Pattern::class, mappedBy: 'route', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    public private(set) Collection $patterns;
+    #[ORM\Column(nullable: true)]
+    public private(set) ?int $cityCode = null;
 
     #[ORM\Column]
     public private(set) ?DateTimeImmutable $createdAt = null;
@@ -43,10 +37,7 @@ final class Route
     #[ORM\Column]
     public private(set) ?DateTimeImmutable $updatedAt = null;
 
-    private function __construct()
-    {
-        $this->patterns = new ArrayCollection();
-    }
+    private function __construct() {}
 
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
@@ -61,12 +52,13 @@ final class Route
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public static function create(string $shortName, string $longName): static
+    public static function create(string $name, Coordinates $coordinates, ?int $cityCode = null): self
     {
-        $route = new self();
-        $route->shortName = $shortName;
-        $route->longName = $longName;
+        $stop = new self();
+        $stop->name = $name;
+        $stop->coordinates = $coordinates;
+        $stop->cityCode = $cityCode;
 
-        return $route;
+        return $stop;
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tasks\Route;
 
-use App\Entity\Route\Pattern;
-use App\Repository\Interfaces\RouteRepositoryInterface;
+use App\Data\Entity\Route\Pattern;
+use App\Data\Repository\Interfaces\RouteRepositoryInterface;
 
 final readonly class FindPatternsWithRoutesByIdsTask
 {

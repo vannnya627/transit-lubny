@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tasks\Route;
 
-use App\Entity\Route\Route;
-use App\Repository\Interfaces\RouteRepositoryInterface;
+use App\Data\Entity\Route\Route;
+use App\Data\Repository\Interfaces\RouteRepositoryInterface;
 
 final readonly class GetAllRouteTask
 {

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Actions\Route;
 
+use App\Data\Entity\Route\Pattern;
 use App\DTOs\PatternDTO;
 use App\DTOs\RouteWithPatternsDTO;
-use App\Entity\Route\Pattern;
 use App\Tasks\Route\GetRouteTask;
 
 final readonly class GetRouteAction
