@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\API\Responses;
 
-class PatternResponse
+final readonly class PatternResponse
 {
     public function __construct(
         public int $id,

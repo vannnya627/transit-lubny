@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\API\Responses;
 
-class RouteWithPatternsResponse
+final readonly class RouteWithPatternsResponse
 {
     /**
      * @param list<PatternResponse> $patterns
