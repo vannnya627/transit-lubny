@@ -24,4 +24,6 @@ interface RouteRepositoryInterface
      * @return list<Pattern>
      */
     public function findPatternsWithRoutesByIds(array $patternIds): array;
+
+    public function getPatternWithRouteById(int $patternId): Pattern;
 }

@@ -30,6 +30,7 @@ final class Trip
      * @var Collection<int, StopTime>
      */
     #[ORM\OneToMany(targetEntity: StopTime::class, mappedBy: 'trip', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['stopSequence' => 'ASC'])]
     public private(set) Collection $stopTimes;
 
     #[ORM\Column]

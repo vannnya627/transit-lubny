@@ -18,4 +18,6 @@ interface TripRepositoryInterface
      * @return list<Trip>
      */
     public function findTripsWithStopTimesForStop(GetStopDeparturesInput $input): array;
+
+    public function getTripById(int $tripId): Trip;
 }

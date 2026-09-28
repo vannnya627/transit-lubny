@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\DTOs\Input\GetStopDeparturesInput;
 use App\Entity\Trip\Trip;
+use App\Exceptions\Exception\TripNotFoundException;
 use App\Repository\Interfaces\TripRepositoryInterface;
 use App\Repository\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -59,5 +60,10 @@ final class TripRepository extends ServiceEntityRepository implements TripReposi
         $stopTimes = $qb->getQuery()->getResult();
 
         return $stopTimes;
+    }
+
+    public function getTripById(int $tripId): Trip
+    {
+        return $this->find($tripId) ?? throw new TripNotFoundException($tripId);
     }
 }

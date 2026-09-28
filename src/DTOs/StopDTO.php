@@ -12,5 +12,6 @@ final readonly class StopDTO
         public int $id,
         public string $name,
         public Coordinates $coordinates,
+        public ?int $cityCode = null,
     ) {}
 }

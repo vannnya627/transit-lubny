@@ -11,6 +11,7 @@ parameters:
         App\Exceptions\Exception\RouteNotFoundException: { type: 'route-not-found', code: 404, loggable: false }
         App\Exceptions\Exception\PatternNotFoundException: { type: 'pattern-not-found', code: 404, loggable: false }
         App\Exceptions\Exception\StopNotFoundException: { type: 'stop-not-found', code: 404, loggable: false }
+        App\Exceptions\Exception\TripNotFoundException: { type: 'trip-not-found', code: 404, loggable: false }
 
 services:
     # default configuration for services in *this* file
