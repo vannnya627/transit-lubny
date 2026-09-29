@@ -49,12 +49,7 @@ final class TripRepository extends ServiceEntityRepository implements TripReposi
             ->setMaxResults($input->limit)
             ->setParameter('stopId', $input->stopId);
 
-        $secondsFromMidnight =
-            ((int) $input->time->format('H') * 3600) +
-            ((int) $input->time->format('i') * 60) +
-            ((int) $input->time->format('s'));
-
-        $qb->setParameter('time', $secondsFromMidnight);
+        $qb->setParameter('time', $input->getSecondsFromMidnight());
 
         /** @var list<Trip> $stopTimes */
         $stopTimes = $qb->getQuery()->getResult();

@@ -25,35 +25,22 @@ final readonly class GetStopDeparturesAction
     {
         $trips = $this->findTripsWithStopTimesForStopTask->run($input);
 
-        $patterns = $this->findPatternsWithRoutesByIds->run($this->getPatternIds($trips));
+        $patternIds = $this->extractPatternIds($trips);
+        $patterns = $this->findPatternsWithRoutesByIds->run($patternIds);
 
-        $patternsById = [];
-        foreach ($patterns as $pattern) {
-            $patternsById[$pattern->id] = $pattern;
-        }
-
-        $secondsFromMidnight =
-            ((int) $input->time->format('H') * 3600) +
-            ((int) $input->time->format('i') * 60) +
-            ((int) $input->time->format('s'));
+        $patternsById = array_column($patterns, null, 'id');
+        $secondsFromMidnight = $input->getSecondsFromMidnight();
 
         return array_map(function (Trip $trip) use ($secondsFromMidnight, $patternsById): DepartureDTO {
             $pattern = $patternsById[$trip->patternId];
             $stopTime = $trip->getFirstStopTime();
 
-            $hour = floor($stopTime->arrivalTime / 3600);
-            $minute = floor(($stopTime->arrivalTime % 3600) / 60);
-            $arrivalTime =  sprintf('%02d:%02d', $hour, $minute);
-
-            $diffInSeconds = $stopTime->arrivalTime - $secondsFromMidnight;
-            $expectedInMinutes = (int) floor($diffInSeconds / 60);
-
             return new DepartureDTO(
                 tripId: $trip->id,
                 route: new RouteDTO(id: $pattern->route->id, shortName: $pattern->route->shortName, longName: $pattern->route->longName),
                 headsign: $pattern->name,
-                arrivalTime: $arrivalTime,
-                expectedInMinutes: $expectedInMinutes,
+                arrivalTime: $stopTime->getFormattedArrivalTime(),
+                expectedInMinutes: $stopTime->getMinutesUntil($secondsFromMidnight),
             );
         }, $trips);
     }
@@ -63,13 +50,10 @@ final readonly class GetStopDeparturesAction
      *
      * @return array<int, int>
      */
-    private function getPatternIds(array $trips): array
+    private function extractPatternIds(array $trips): array
     {
-        $patternIds = [];
-        foreach ($trips as $trip) {
-            $patternIds[] = $trip->patternId;
-        }
-
-        return array_unique($patternIds);
+        return array_map(fn(Trip $trip) => $trip->patternId, $trips)
+                |> array_unique(...)
+                |> array_values(...);
     }
 }

@@ -24,23 +24,23 @@ final readonly class GetTripAction
         private FindStopsByIdsTask $findStopsByIdsTask,
     ) {}
 
-    public function run(int $tripId): TripDetailsDTO
+    public function run(int $tripId, ?DateTimeImmutable $now = null): TripDetailsDTO
     {
         $trip = $this->getTripByIdTask->run($tripId);
         $pattern = $this->getPatternWithRouteByPatternIdTask->run($trip->patternId);
 
-        $stops = $this->findStopsByIdsTask->run(array_column($trip->stopTimes->toArray(), 'stopId'));
+        $stopTimes = $trip->stopTimes->toArray();
+        $stops = $this->findStopsByIdsTask->run(array_column($stopTimes, 'stopId'));
 
         $sortedStopsById = array_column($stops, null, 'id');
 
-        $secondsFromMidnight = $this->getSecondsFromMidnight(new DateTimeImmutable('now', new DateTimeZone('Europe/Kyiv')));
+        $now ??= new DateTimeImmutable('now', new DateTimeZone('Europe/Kyiv'));
+        $secondsFromMidnight = $this->getSecondsFromMidnight($now);
 
         $stopForTripDTOs = array_map(function (StopTime $stopTime) use ($secondsFromMidnight, $sortedStopsById) {
 
             /** @var Stop $stop */
             $stop = $sortedStopsById[$stopTime->stopId];
-
-            $arrivalTime = gmdate('H:i', $stopTime->arrivalTime);
 
             return new StopForTripDTO(
                 sequence: $stopTime->stopSequence,
@@ -50,10 +50,10 @@ final readonly class GetTripAction
                     coordinates: $stop->coordinates,
                     cityCode: $stop->cityCode,
                 ),
-                arrivalTime: $arrivalTime,
-                isPassed: $stopTime->arrivalTime < $secondsFromMidnight,
+                arrivalTime: $stopTime->getFormattedArrivalTime(),
+                isPassed: $stopTime->isPassed($secondsFromMidnight),
             );
-        }, $trip->stopTimes->toArray());
+        }, $stopTimes);
 
 
         return new TripDetailsDTO(

@@ -22,5 +22,10 @@ final readonly class GetStopDeparturesInput
         $this->time = $time ?? new DateTimeImmutable('now', new DateTimeZone('Europe/Kyiv'));
     }
 
-
+    public function getSecondsFromMidnight(): int
+    {
+        return ((int) $this->time->format('H') * 3600) +
+            ((int) $this->time->format('i') * 60) +
+            ((int) $this->time->format('s'));
+    }
 }

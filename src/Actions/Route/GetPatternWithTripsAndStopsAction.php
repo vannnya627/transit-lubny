@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Actions\Route;
 
-use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Stop;
 use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
@@ -26,9 +25,9 @@ final readonly class GetPatternWithTripsAndStopsAction
     public function run(int $patternId): PatternWithStopsAndTripsDTO
     {
         $pattern = $this->getPatternByIdTask->run($patternId);
-        $patternStops = array_values($pattern->patternStops->toArray());
 
-        $stopIds = $this->getStopsIds($patternStops);
+        $patternStops = array_values($pattern->patternStops->toArray());
+        $stopIds = array_column($patternStops, 'stopId');
 
         $stops = $this->findStopsByIdsTask->run($stopIds);
         $trips = $this->findTripsWithStopTimesByPatternIdTask->run($patternId);
@@ -48,8 +47,6 @@ final readonly class GetPatternWithTripsAndStopsAction
             $stopTimes = array_values($trip->stopTimes->toArray());
             $stopTimesStr = $this->getStopTimeStr($stopTimes);
 
-            ksort($stopTimesStr);
-
             return new TripDTO(
                 tripId: $trip->id,
                 serviceDays: $trip->serviceDays,
@@ -68,21 +65,6 @@ final readonly class GetPatternWithTripsAndStopsAction
     }
 
     /**
-     * @param list<PatternStop> $patternStops
-     *
-     * @return array<int, int>
-     */
-    private function getStopsIds(array $patternStops): array
-    {
-        $stopIds = [];
-        foreach ($patternStops as $patternStop) {
-            $stopIds[] = $patternStop->stopId;
-        }
-
-        return $stopIds;
-    }
-
-    /**
      * @param list<StopTime> $stopTimes
      *
      * @return array<int, string>
@@ -91,11 +73,10 @@ final readonly class GetPatternWithTripsAndStopsAction
     {
         $stopTimesStr = [];
         foreach ($stopTimes as $stopTime) {
-            $hour = floor($stopTime->arrivalTime / 3600);
-            $minute = floor(($stopTime->arrivalTime % 3600) / 60);
-
-            $stopTimesStr[$stopTime->stopSequence - 1] = sprintf('%02d:%02d', $hour, $minute);
+            $stopTimesStr[$stopTime->stopSequence - 1] = $stopTime->getFormattedArrivalTime();
         }
+
+        ksort($stopTimesStr);
 
         return $stopTimesStr;
     }

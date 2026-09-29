@@ -40,4 +40,24 @@ final class StopTime
 
         return $stopTime;
     }
+
+    public function getFormattedArrivalTime(): string
+    {
+        $hour = floor($this->arrivalTime / 3600);
+        $minute = floor(($this->arrivalTime % 3600) / 60);
+
+        return sprintf('%02d:%02d', $hour, $minute);
+    }
+
+    public function getMinutesUntil(int $secondsFormMidnight): int
+    {
+        $diffInSeconds = $this->arrivalTime - $secondsFormMidnight;
+
+        return (int) floor($diffInSeconds / 60);
+    }
+
+    public function isPassed(int $secondsFromMidnight): bool
+    {
+        return $this->arrivalTime < $secondsFromMidnight;
+    }
 }
