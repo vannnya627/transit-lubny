@@ -28,7 +28,7 @@ final class Stop
     #[ORM\Embedded(class: Coordinates::class, columnPrefix: false)]
     public private(set) Coordinates $coordinates;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(unique: true, nullable: true)]
     public private(set) ?int $cityCode = null;
 
     #[ORM\Column]
