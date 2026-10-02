@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\UI\API\Controller\Stop;
 
 use App\Actions\Stop\GetStopDeparturesAction;
-use App\DTOs\Input\GetStopDeparturesInput;
 use App\UI\API\Requests\DeparturesQueryParameter;
 use App\UI\API\Responses\DepartureResponse;
 use App\UI\API\Transformers\DepartureTransformer;
@@ -42,14 +41,7 @@ final class GetStopDeparturesController extends AbstractController
     )]
     public function __invoke(int $id, #[MapQueryString] DeparturesQueryParameter $parameter): JsonResponse
     {
-
-        $departuresDTOs = $this->action->run(
-            new GetStopDeparturesInput(
-                stopId: $id,
-                time: $parameter->time,
-                limit: $parameter->limit,
-            ),
-        );
+        $departuresDTOs = $this->action->run($parameter->toInput($id));
 
         return $this->json(array_map($this->transformer->transform(...), $departuresDTOs));
     }

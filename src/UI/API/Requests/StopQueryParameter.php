@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace App\UI\API\Requests;
 
+use App\Data\ValueObjects\Coordinates;
 use App\DTOs\Input\SearchStopsInput;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-// todo - composer require symfony/expression-language
-/*#[Assert\Expression(
-    '((this.lat == null and this.lon == null) or (this.lat != null and this.lon !=null))',
-    message: 'Широта (lat) та довгота (lon) повинні передаватися тільки разом.',
-)]*/
 final readonly class StopQueryParameter
 {
+    public private(set) ?Coordinates $coordinates;
+
     public function __construct(
         #[OA\Property(description: 'Пошук за назвою зупинки', example: 'Лікарня')]
         public ?string $q = null,
@@ -27,5 +26,28 @@ final readonly class StopQueryParameter
         #[OA\Property(description: 'Радіус у метрах', example: '500', default: SearchStopsInput::DEFAULT_RADIUS)]
         #[Assert\Positive(message: 'Радіус має бути додатнім числом')]
         public ?int $radius = null,
-    ) {}
+    ) {
+        $this->coordinates = (null !== $this->lat && null !== $this->lon)
+            ? Coordinates::create($this->lat, $this->lon)
+            : null;
+    }
+
+    #[Assert\Callback]
+    public function validateCoordinates(ExecutionContextInterface $context): void
+    {
+        if ((null === $this->lat) !== (null === $this->lon)) {
+            $context->buildViolation('Широта (lat) та довгота (lon) повинні передаватися тільки разом.')
+                ->atPath('lat')
+                ->addViolation();
+        }
+    }
+
+    public function toInput(): SearchStopsInput
+    {
+        return new SearchStopsInput(
+            q: $this->q,
+            coordinates: $this->coordinates,
+            radius: $this->radius,
+        );
+    }
 }

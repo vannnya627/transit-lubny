@@ -23,4 +23,13 @@ final readonly class DeparturesQueryParameter
         #[Assert\LessThanOrEqual(100, message: 'Максимум 100 рейсів')]
         public ?int $limit = null,
     ) {}
+
+    public function toInput(int $stopId): GetStopDeparturesInput
+    {
+        return new GetStopDeparturesInput(
+            stopId: $stopId,
+            time: $this->time,
+            limit: $this->limit,
+        );
+    }
 }
