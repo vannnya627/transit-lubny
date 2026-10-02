@@ -38,6 +38,7 @@ final class Pattern
      * @var Collection<int, PatternStop>
      */
     #[ORM\OneToMany(targetEntity: PatternStop::class, mappedBy: 'pattern', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['stopSequence' => 'ASC'])]
     public private(set) Collection $patternStops;
     #[ORM\Column]
     public private(set) ?DateTimeImmutable $createdAt = null;

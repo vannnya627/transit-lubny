@@ -27,6 +27,7 @@ final readonly class GetPatternWithTripsAndStopsAction
         $pattern = $this->getPatternByIdTask->run($patternId);
 
         $patternStops = array_values($pattern->patternStops->toArray());
+        usort($patternStops, static fn($a, $b): int => $a->stopSequence <=> $b->stopSequence);
         $stopIds = array_column($patternStops, 'stopId');
 
         $stops = $this->findStopsByIdsTask->run($stopIds);
@@ -53,6 +54,11 @@ final readonly class GetPatternWithTripsAndStopsAction
                 stopTimes: $stopTimesStr,
             );
         }, $trips);
+
+        usort(
+            $tripsDTOs,
+            static fn(TripDTO $a, TripDTO $b): int => ($a->stopTimes[0] ?? '') <=> ($b->stopTimes[0] ?? ''),
+        );
 
         return new PatternWithStopsAndTripsDTO(
             id: $pattern->id,
