@@ -8,7 +8,9 @@ use App\Data\Entity\Trip\Trip;
 use App\DTOs\DepartureDTO;
 use App\DTOs\Input\GetStopDeparturesInput;
 use App\DTOs\RouteDTO;
+use App\DTOs\StopWithDeparturesDTO;
 use App\Tasks\Route\FindPatternsWithRoutesByIdsTask;
+use App\Tasks\Stop\GetStopByIdTask;
 use App\Tasks\Trip\FindTripsWithStopTimesForStopTask;
 
 final readonly class GetStopDeparturesAction
@@ -16,13 +18,13 @@ final readonly class GetStopDeparturesAction
     public function __construct(
         private FindTripsWithStopTimesForStopTask $findTripsWithStopTimesForStopTask,
         private FindPatternsWithRoutesByIdsTask $findPatternsWithRoutesByIds,
+        private GetStopByIdTask $getStopByIdTask,
     ) {}
 
-    /**
-     * @return list<DepartureDTO>
-     */
-    public function run(GetStopDeparturesInput $input): array
+    public function run(GetStopDeparturesInput $input): StopWithDeparturesDTO
     {
+        // todo - тут знаходжу зупинку щоб взяти тільки з неї імя, можливо змінити
+        $stop = $this->getStopByIdTask->run($input->stopId);
         $trips = $this->findTripsWithStopTimesForStopTask->run($input);
 
         $patternIds = $this->extractPatternIds($trips);
@@ -31,7 +33,7 @@ final readonly class GetStopDeparturesAction
         $patternsById = array_column($patterns, null, 'id');
         $secondsFromMidnight = $input->getSecondsFromMidnight();
 
-        return array_map(function (Trip $trip) use ($secondsFromMidnight, $patternsById): DepartureDTO {
+        $departures = array_map(function (Trip $trip) use ($secondsFromMidnight, $patternsById): DepartureDTO {
             $pattern = $patternsById[$trip->patternId];
             $stopTime = $trip->getFirstStopTime();
 
@@ -43,6 +45,13 @@ final readonly class GetStopDeparturesAction
                 expectedInMinutes: $stopTime->getMinutesUntil($secondsFromMidnight),
             );
         }, $trips);
+
+        return new StopWithDeparturesDTO(
+            stopId: $stop->id,
+            stopName: $stop->name,
+            cityCode: $stop->cityCode,
+            departures: $departures,
+        );
     }
 
     /**

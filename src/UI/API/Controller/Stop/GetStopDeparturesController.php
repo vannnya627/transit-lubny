@@ -6,8 +6,8 @@ namespace App\UI\API\Controller\Stop;
 
 use App\Actions\Stop\GetStopDeparturesAction;
 use App\UI\API\Requests\DeparturesQueryParameter;
-use App\UI\API\Responses\DepartureResponse;
-use App\UI\API\Transformers\DepartureTransformer;
+use App\UI\API\Responses\StopWithDeparturesResponse;
+use App\UI\API\Transformers\StopWithDeparturesTransformer;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +21,7 @@ final class GetStopDeparturesController extends AbstractController
 {
     public function __construct(
         private readonly GetStopDeparturesAction $action,
-        private readonly DepartureTransformer $transformer,
+        private readonly StopWithDeparturesTransformer $transformer,
     ) {}
 
     #[OA\Get(
@@ -35,14 +35,14 @@ final class GetStopDeparturesController extends AbstractController
         content: new OA\JsonContent(
             type: 'array',
             items: new OA\Items(
-                ref: new Model(type: DepartureResponse::class),
+                ref: new Model(type: StopWithDeparturesResponse::class),
             ),
         ),
     )]
     public function __invoke(int $id, #[MapQueryString] DeparturesQueryParameter $parameter): JsonResponse
     {
-        $departuresDTOs = $this->action->run($parameter->toInput($id));
+        $stopWithDepartures = $this->action->run($parameter->toInput($id));
 
-        return $this->json(array_map($this->transformer->transform(...), $departuresDTOs));
+        return $this->json($this->transformer->transform($stopWithDepartures));
     }
 }
