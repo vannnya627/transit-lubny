@@ -1,0 +1,54 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Маршрут №{{ route.shortName }} | Лубни{% endblock %}
+
+{% block body %}
+<main class="container" hx-boost="true">
+
+    <nav class="breadcrumbs">
+        <a href="{{ path('web_all_routes') }}">← ВСІ МАРШРУТИ</a>
+    </nav>
+
+    <header class="page-header">
+        <span class="route-badge">№ {{ route.shortName }}</span>
+        <h1 style="margin-top: 0.5rem;">{{ route.longName }}</h1>
+        <p class="subtitle">Оберіть напрямок руху для перегляду розкладу та зупинок</p>
+    </header>
+
+    <section>
+        <h2 style="font-size: 1.2rem; margin-bottom: 0.75rem; text-transform: uppercase;">
+            Напрямки руху:
+        </h2>
+
+        {% if route.parameters is empty %}
+            <div class="empty-state">
+                <p><strong>[!] Напрямків для цього маршруту наразі немає.</strong></p>
+            </div>
+        {% else %}
+            <div class="pattern-list">
+                {% for pattern in route.parameters %}
+                    <div class="pattern-card">
+                        <div>
+                            <span class="badge {{ pattern.direction.value == 1 ? 'badge-forward' : 'badge-return' }}">
+                                {{ pattern.direction.getLabel() }}
+                            </span>
+
+                            <h3 style="font-size: 1.15rem; margin-top: 0.5rem;">
+                                {{ pattern.name }}
+                            </h3>
+                        </div>
+
+                        <div style="margin-top: 0.75rem;">
+                            <a href="{{ path('web_get_info_about_pattern', {id: pattern.id}) }}" class="btn">
+                                ПЕРЕГЛЯНУТИ РОЗКЛАД →
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+
+</main>
+{% endblock %}

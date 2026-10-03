@@ -1,0 +1,178 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Зупинки | Лубни{% endblock %}
+
+{% block body %}
+<main class="container" hx-boost="true">
+
+    <nav class="breadcrumbs">
+        <a href="{{ path('web_all_routes') }}">← ВСІ МАРШРУТИ</a>
+    </nav>
+
+    <header class="page-header">
+        <h1>🚏 ЗУПИНКИ ТРАНСПОРТУ</h1>
+        <p class="subtitle">Пошук за назвою або найближчих зупинок за координатами GPS</p>
+    </header>
+
+    {% set queryQ = app.request.query.get('q') %}
+    {% set queryLat = app.request.query.get('lat') %}
+    {% set queryLon = app.request.query.get('lon') %}
+    {% set queryRadius = app.request.query.get('radius')|default(500) %}
+
+    <form method="GET" action="{{ path('web_stops') }}" id="stopsSearchForm" class="brut-box">
+        <input type="hidden" name="lat" id="inputLat" value="{{ queryLat }}">
+        <input type="hidden" name="lon" id="inputLon" value="{{ queryLon }}">
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <input type="search"
+                   name="q"
+                   id="inputQ"
+                   value="{{ queryQ }}"
+                   placeholder="Назва зупинки (наприклад: Автовокзал, Лікарня)..."
+                   style="flex: 1; min-width: 240px;"
+                   autofocus>
+            <button type="submit" class="btn">ЗНАЙТИ</button>
+
+            {% if queryQ or queryLat or queryLon %}
+                <a href="{{ path('web_stops') }}" class="btn btn-white">СКИНУТИ</a>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; padding-top: 0.75rem; border-top: 1px solid #000;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" id="btnDetectLocation" onclick="detectUserLocation()" class="btn btn-white" style="font-size: 0.85rem;">
+                    📍 ВИЗНАЧИТИ МОЄ МІСЦЕЗНАХОДЖЕННЯ
+                </button>
+                <span id="geoStatus" style="font-size: 0.85rem; font-weight: bold;"></span>
+
+                {% if queryLat and queryLon %}
+                    <span class="badge badge-now" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                        GPS: {{ queryLat|round(3) }}, {{ queryLon|round(3) }}
+                        <button type="button" id="btnClearGeo" onclick="clearGeoLocation()" style="background: none; border: none; box-shadow: none; cursor: pointer; font-weight: bold; padding: 0;">
+                            [✕]
+                        </button>
+                    </span>
+                {% endif %}
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <label for="selectRadius" style="font-weight: bold; font-size: 0.85rem;">РАДІУС:</label>
+                <select name="radius" id="selectRadius" onchange="handleRadiusChange()">
+                    <option value="300" {{ queryRadius == 300 ? 'selected' : '' }}>300 м</option>
+                    <option value="500" {{ queryRadius == 500 ? 'selected' : '' }}>500 м</option>
+                    <option value="1000" {{ queryRadius == 1000 ? 'selected' : '' }}>1 000 м (1 км)</option>
+                    <option value="2000" {{ queryRadius == 2000 ? 'selected' : '' }}>2 000 м (2 км)</option>
+                    <option value="5000" {{ queryRadius == 5000 ? 'selected' : '' }}>5 000 м (5 км)</option>
+                </select>
+            </div>
+        </div>
+    </form>
+
+    <div style="margin-bottom: 1rem; font-weight: bold; font-size: 0.9rem;">
+        ЗНАЙДЕНО ЗУПИНОК: [{{ stops|length }}]
+        {% if queryQ %}
+            | Запит: "{{ queryQ }}"
+        {% endif %}
+        {% if queryLat and queryLon %}
+            | GPS радіус: {{ queryRadius }} м
+        {% endif %}
+    </div>
+
+    {% if stops is empty %}
+        <div class="empty-state">
+            <p><strong>[!] За вашим запитом зупинок не знайдено.</strong></p>
+            <div style="margin-top: 1rem;">
+                <a href="{{ path('web_stops') }}" class="btn">ПОКАЗАТИ ВСІ ЗУПИНКИ</a>
+            </div>
+        </div>
+    {% else %}
+        <section class="stop-grid">
+            {% for stop in stops %}
+                <article class="stop-card">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <h2 class="stop-name">
+                                <a href="{{ path('web_stop', {id: stop.id}) }}" style="color: inherit; text-decoration: none;">
+                                    {{ stop.name }}
+                                </a>
+                            </h2>
+                            {% if stop.cityCode %}
+                                <span class="badge" style="background: var(--accent-gray);">
+                                    #{{ stop.cityCode }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        {% if stop.coordinates.lat != 0 and stop.coordinates.lon != 0 %}
+                            <div style="font-size: 0.8rem; color: #555;">
+                                Координати: {{ stop.coordinates.lat|round(4) }}, {{ stop.coordinates.lon|round(4) }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; border-top: 1px solid #000; padding-top: 0.75rem;">
+                        <a href="{{ path('web_stop_departures', {id: stop.id}) }}" class="btn" style="flex: 1;">
+                            ⏱️ РЕЙСИ →
+                        </a>
+                        <a href="{{ path('web_stop', {id: stop.id}) }}" class="btn btn-white">
+                            ІНФО
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+</main>
+
+<script>
+    window.detectUserLocation = function () {
+        const btn = document.getElementById('btnDetectLocation');
+        const geoStatus = document.getElementById('geoStatus');
+        const inputLat = document.getElementById('inputLat');
+        const inputLon = document.getElementById('inputLon');
+        const form = document.getElementById('stopsSearchForm');
+
+        if (!navigator.geolocation) {
+            if (geoStatus) geoStatus.textContent = '[!] Браузер не підтримує GPS';
+            return;
+        }
+
+        if (geoStatus) geoStatus.textContent = 'Отримуємо координати GPS...';
+        if (btn) btn.disabled = true;
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                if (inputLat) inputLat.value = position.coords.latitude.toFixed(6);
+                if (inputLon) inputLon.value = position.coords.longitude.toFixed(6);
+                if (geoStatus) geoStatus.textContent = 'Знайдено! Оновлення...';
+                if (form) form.submit();
+            },
+            function (error) {
+                if (btn) btn.disabled = false;
+                if (geoStatus) geoStatus.textContent = '[!] Помилка або заборона доступу до GPS';
+            },
+            { enableHighAccuracy: true, timeout: 8000 }
+        );
+    };
+
+    window.clearGeoLocation = function () {
+        const inputLat = document.getElementById('inputLat');
+        const inputLon = document.getElementById('inputLon');
+        const form = document.getElementById('stopsSearchForm');
+        if (inputLat) inputLat.value = '';
+        if (inputLon) inputLon.value = '';
+        if (form) form.submit();
+    };
+
+    window.handleRadiusChange = function () {
+        const inputLat = document.getElementById('inputLat');
+        const inputLon = document.getElementById('inputLon');
+        const form = document.getElementById('stopsSearchForm');
+        if (inputLat && inputLat.value && inputLon && inputLon.value && form) {
+            form.submit();
+        }
+    };
+</script>
+{% endblock %}

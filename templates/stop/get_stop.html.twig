@@ -1,0 +1,61 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Зупинка: {{ stop.name }} | Лубни{% endblock %}
+
+{% block body %}
+<main class="container" hx-boost="true">
+
+    <nav class="breadcrumbs">
+        <a href="{{ path('web_stops') }}">← ВСІ ЗУПИНКИ</a>
+        <span> / </span>
+        <a href="{{ path('web_all_routes') }}">ВСІ МАРШРУТИ</a>
+    </nav>
+
+    <article class="brut-box">
+        <header class="page-header" style="margin-bottom: 1.25rem;">
+            {% if stop.cityCode %}
+                <span class="badge" style="background: var(--accent-gray);">
+                    МІСЬКИЙ КОД: {{ stop.cityCode }}
+                </span>
+            {% endif %}
+            <h1 style="margin-top: 0.5rem;">{{ stop.name }}</h1>
+        </header>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+            <div style="border-bottom: 1px solid #000; padding-bottom: 0.5rem;">
+                <span style="font-weight: bold;">НАЗВА:</span> {{ stop.name }}
+            </div>
+
+            {% if stop.cityCode %}
+                <div style="border-bottom: 1px solid #000; padding-bottom: 0.5rem;">
+                    <span style="font-weight: bold;">КОД (cityCode):</span> {{ stop.cityCode }}
+                </div>
+            {% endif %}
+
+            {% if stop.coordinates.lat != 0 and stop.coordinates.lon != 0 %}
+                <div style="border-bottom: 1px solid #000; padding-bottom: 0.5rem;">
+                    <span style="font-weight: bold;">GPS КООРДИНАТИ:</span>
+                    {{ stop.coordinates.lat }}, {{ stop.coordinates.lon }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="btn-group">
+            <a href="{{ path('web_stop_departures', {id: stop.id}) }}" class="btn">
+                ⏱️ НАЙБЛИЖЧІ РЕЙСИ З ЦІЄЇ ЗУПИНКИ →
+            </a>
+
+            {% if stop.coordinates.lat != 0 and stop.coordinates.lon != 0 %}
+                <a href="https://www.openstreetmap.org/?mlat={{ stop.coordinates.lat }}&mlon={{ stop.coordinates.lon }}#map=17/{{ stop.coordinates.lat }}/{{ stop.coordinates.lon }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="btn btn-white">
+                    КАРТА (OPENSTREETMAP) ↗
+                </a>
+            {% endif %}
+        </div>
+    </article>
+
+</main>
+{% endblock %}

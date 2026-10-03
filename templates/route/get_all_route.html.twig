@@ -1,0 +1,46 @@
+{#
+    Шаблон: templates/route/get_all_route.html.twig
+    Стиль: Необруталізм / "Better Motherfucking Website" (сухий HTML, товсті контури, Courier New).
+    Інтерактивність: HTMX (hx-boost="true" робить переходи між сторінками миттєвими без перезавантаження).
+#}
+{% extends 'base.html.twig' %}
+
+{% block title %}Маршрути | Лубни{% endblock %}
+
+{% block body %}
+
+<main class="container" hx-boost="true">
+
+    <header class="page-header">
+        <h1>🚌 МАРШРУТИ ЛУБЕН</h1>
+        <p class="subtitle">Міські автобуси, розклад рейсів та схема зупинок</p>
+
+        <div>
+            <a href="{{ path('web_stops') }}" class="btn btn-white">
+                📍 ЗНАЙТИ ЗУПИНКУ ПОРУЧ →
+            </a>
+        </div>
+    </header>
+
+    {% if routes is empty %}
+        <div class="empty-state">
+            <p><strong>[!] Маршрутів не знайдено в базі даних.</strong></p>
+        </div>
+    {% else %}
+        <section class="route-grid">
+            {% for route in routes %}
+                <a href="{{ path('web_get_route', {id: route.id}) }}" class="route-card">
+                    <div class="route-badge">
+                        № {{ route.shortName }}
+                    </div>
+                    <div class="route-info">
+                        <div class="route-title">{{ route.longName }}</div>
+                        <small style="text-decoration: underline;">Переглянути напрямки та графік →</small>
+                    </div>
+                </a>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+</main>
+{% endblock %}

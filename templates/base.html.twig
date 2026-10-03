@@ -2,13 +2,15 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Маршрутки Лубни{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🚌</text></svg>">
         {% block stylesheets %}
         {% endblock %}
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script src="https://unpkg.com/htmx.org@2.0.4"></script>
         {% endblock %}
 
         {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
@@ -19,6 +21,25 @@
         {% endif %}
     </head>
     <body>
+        <header class="site-header">
+            <div class="site-header-container">
+                <a href="{{ path('web_all_routes') }}" class="site-logo">
+                    🚌 <span>Маршрутки Лубни</span>
+                </a>
+                <nav class="site-nav">
+                    {% set currentRoute = app.request.attributes.get('_route') %}
+                    <a href="{{ path('web_all_routes') }}"
+                       class="nav-link {{ currentRoute in ['web_all_routes', 'web_get_route', 'web_get_info_about_pattern', 'web_trips'] ? 'active' : '' }}">
+                        Маршрути
+                    </a>
+                    <a href="{{ path('web_stops') }}"
+                       class="nav-link {{ currentRoute in ['web_stops', 'web_stop', 'web_stop_departures'] ? 'active' : '' }}">
+                        Зупинки
+                    </a>
+                </nav>
+            </div>
+        </header>
+
         {% block body %}{% endblock %}
     </body>
 </html>

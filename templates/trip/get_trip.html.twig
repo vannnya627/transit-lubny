@@ -1,0 +1,92 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Рейс #{{ trip.tripId }} (№{{ trip.route.shortName }}) — {{ trip.headsign }} | Лубни{% endblock %}
+
+{% block body %}
+<main class="container" hx-boost="true">
+
+    <nav class="breadcrumbs">
+        <a href="{{ path('web_get_route', {id: trip.route.id}) }}">
+            ← ДО МАРШРУТУ № {{ trip.route.shortName }}
+        </a>
+        <span> / </span>
+        <a href="{{ path('web_all_routes') }}">ВСІ МАРШРУТИ</a>
+    </nav>
+
+    <article class="brut-box">
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+            <a href="{{ path('web_get_route', {id: trip.route.id}) }}" class="route-badge" style="text-decoration: none;">
+                № {{ trip.route.shortName }}
+            </a>
+            <span class="badge" style="background: var(--accent-gray);">
+                РЕЙС #{{ trip.tripId }}
+            </span>
+            <span class="badge" style="background: var(--accent-gray);">
+                ЗУПИНОК: {{ trip.stops|length }}
+            </span>
+        </div>
+
+        <h1 style="font-size: 1.6rem; font-weight: 900; margin-bottom: 0.25rem;">
+            {{ trip.headsign }}
+        </h1>
+        <p class="subtitle" style="margin-bottom: 0;">
+            {{ trip.route.longName }}
+        </p>
+    </article>
+
+    <section>
+        <h2 style="font-size: 1.2rem; font-weight: 900; margin-bottom: 1rem; text-transform: uppercase;">
+            Графік руху рейсу по зупинках:
+        </h2>
+
+        <ol class="trip-timeline">
+
+            {% for item in trip.stops %}
+                <li class="trip-stop-item {{ item.isPassed ? 'passed' : '' }}">
+
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span class="seq-box" title="Зупинка #{{ item.sequence }}">
+                            {{ item.isPassed ? '✓' : item.sequence }}
+                        </span>
+
+                        <div>
+                            <div style="font-size: 1.05rem; font-weight: 900;">
+                                <a href="{{ path('web_stop', {id: item.stop.id}) }}" style="color: inherit; text-decoration: none;">
+                                    {{ item.stop.name }}
+                                </a>
+                            </div>
+
+                            {% if item.stop.cityCode %}
+                                <span class="badge" style="font-size: 0.7rem; padding: 0.1rem 0.4rem; background: var(--accent-gray);">
+                                    #{{ item.stop.cityCode }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                        <span style="font-size: 1.3rem; font-weight: 900;">
+                            {{ item.arrivalTime }}
+                        </span>
+
+                        {% if item.isPassed %}
+                            <span class="badge badge-past">ПРОЙДЕНО</span>
+                        {% else %}
+                            <span class="badge badge-now">ОЧІКУЄТЬСЯ</span>
+                        {% endif %}
+
+                        <a href="{{ path('web_stop_departures', {id: item.stop.id}) }}"
+                           class="btn btn-white"
+                           style="font-size: 0.75rem; padding: 0.35rem 0.6rem;">
+                            ⏱️ РЕЙСИ ЗУПИНКИ →
+                        </a>
+                    </div>
+
+                </li>
+            {% endfor %}
+        </ol>
+    </section>
+
+</main>
+{% endblock %}

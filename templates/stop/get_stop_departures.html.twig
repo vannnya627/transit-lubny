@@ -1,0 +1,191 @@
+
+{% extends 'base.html.twig' %}
+
+{% set stopId = departures.stopId %}
+{% set stopName = departures.stopName %}
+{% set cityCode = departures.cityCode %}
+{% set departuresList = departures.departures %}
+
+{% set currentLimit = app.request.query.get('limit')|default('10') %}
+{% set currentTime = app.request.query.get('time') %}
+{% set diffMinutes = currentTime ? ((date(currentTime).timestamp - "now"|date("U")) / 60)|round : null %}
+
+{% block title %}Рейси: {{ stopName }} | Лубни{% endblock %}
+
+{% block body %}
+<main class="container" hx-boost="true">
+
+    <nav class="breadcrumbs">
+        <a href="{{ path('web_stop', {id: stopId}) }}">
+            ← ЗУПИНКА: {{ stopName|upper }}
+        </a>
+        <span> / </span>
+        <a href="{{ path('web_stops') }}">ВСІ ЗУПИНКИ</a>
+        <span> / </span>
+        <a href="{{ path('web_all_routes') }}">МАРШРУТИ</a>
+    </nav>
+
+    <header class="page-header">
+        <h1>⏱️ НАЙБЛИЖЧІ ВІДПРАВЛЕННЯ</h1>
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+            <span class="badge" style="background: var(--accent-yellow);">
+                🚏 ЗУПИНКА: {{ stopName }}
+            </span>
+            {% if cityCode %}
+                <span class="badge" style="background: var(--accent-gray);">
+                    #{{ cityCode }}
+                </span>
+            {% endif %}
+        </div>
+        <p class="subtitle">
+            Розклад рейсів міського транспорту від зупинки <strong>«{{ stopName }}»</strong>
+        </p>
+    </header>
+
+    <section class="brut-box" style="display: flex; flex-direction: column; gap: 1rem;">
+
+        <div>
+            <div style="font-weight: bold; font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase;">
+                Кількість рейсів: [{{ currentLimit }}]
+            </div>
+            <div class="btn-group">
+                <a href="{{ path('web_stop_departures', {id: stopId, limit: 10, time: currentTime}) }}"
+                   class="btn {{ currentLimit == '10' ? '' : 'btn-white' }}">
+                    10 РЕЙСІВ
+                </a>
+                <a href="{{ path('web_stop_departures', {id: stopId, limit: 15, time: currentTime}) }}"
+                   class="btn {{ currentLimit == '15' ? '' : 'btn-white' }}">
+                    15 РЕЙСІВ
+                </a>
+                <a href="{{ path('web_stop_departures', {id: stopId, limit: 20, time: currentTime}) }}"
+                   class="btn {{ currentLimit == '20' ? '' : 'btn-white' }}">
+                    20 РЕЙСІВ
+                </a>
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid #000; padding-top: 0.75rem;">
+            <div style="font-weight: bold; font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase;">
+                Час відправлення: {{ currentTime ? '[ФІЛЬТР УВІМКНЕНО]' : '[ЗАРАЗ]' }}
+            </div>
+            <div class="btn-group">
+                <a href="{{ path('web_stop_departures', {id: stopId, limit: currentLimit}) }}"
+                   class="btn {{ currentTime is empty ? '' : 'btn-white' }}">
+                    ЗАРАЗ
+                </a>
+
+                <a href="{{ path('web_stop_departures', {id: stopId, limit: currentLimit, time: "now"|date_modify("+15 minutes")|date('c', 'Europe/Kyiv')}) }}"
+                   class="btn {{ (diffMinutes is not null and diffMinutes >= 13 and diffMinutes <= 17) ? '' : 'btn-white' }}">
+                    +15 ХВ
+                </a>
+
+                <a href="{{ path('web_stop_departures', {id: stopId, limit: currentLimit, time: "now"|date_modify("+30 minutes")|date('c', 'Europe/Kyiv')}) }}"
+                   class="btn {{ (diffMinutes is not null and diffMinutes >= 27 and diffMinutes <= 33) ? '' : 'btn-white' }}">
+                    +30 ХВ
+                </a>
+
+                <a href="{{ path('web_stop_departures', {id: stopId, limit: currentLimit, time: "now"|date_modify("+60 minutes")|date('c', 'Europe/Kyiv')}) }}"
+                   class="btn {{ (diffMinutes is not null and diffMinutes >= 55 and diffMinutes <= 65) ? '' : 'btn-white' }}">
+                    +1 ГОД
+                </a>
+
+                <a href="{{ path('web_stop_departures', {id: stopId, limit: currentLimit, time: "now"|date_modify("+120 minutes")|date('c', 'Europe/Kyiv')}) }}"
+                   class="btn {{ (diffMinutes is not null and diffMinutes >= 115 and diffMinutes <= 125) ? '' : 'btn-white' }}">
+                    +2 ГОД
+                </a>
+
+                {% set isCustomTime = currentTime and (diffMinutes is null or diffMinutes < 13 or (diffMinutes > 17 and diffMinutes < 27) or (diffMinutes > 33 and diffMinutes < 55) or (diffMinutes > 65 and diffMinutes < 115) or diffMinutes > 125) %}
+                <input type="time"
+                       id="exactTimePicker"
+                       value="{{ currentTime ? currentTime|slice(11, 5) : '' }}"
+                       class="btn {{ isCustomTime ? '' : 'btn-white' }}"
+                       title="Обрати точний час доби"
+                       style="padding: 0.45rem;">
+            </div>
+        </div>
+
+        {% if currentTime or currentLimit != '10' %}
+            <div style="border-top: 1px solid #000; padding-top: 0.5rem; text-align: right;">
+                <a href="{{ path('web_stop_departures', {id: stopId}) }}" class="btn btn-white" style="font-size: 0.8rem;">
+                    [СКИНУТИ ВСІ ФІЛЬТРИ]
+                </a>
+            </div>
+        {% endif %}
+    </section>
+
+    <section>
+        {% if departuresList is empty %}
+            <div class="empty-state">
+                <p><strong>[!] Наразі рейсів не знайдено для обраного часу або рух завершено.</strong></p>
+            </div>
+        {% else %}
+            <div class="departures-list">
+                {% for dep in departuresList %}
+                    <article class="departure-card">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <a href="{{ path('web_get_route', {id: dep.route.id}) }}" class="route-badge" style="text-decoration: none;">
+                                № {{ dep.route.shortName }}
+                            </a>
+                            <div>
+                                <h3 style="font-size: 1.15rem; font-weight: 900;">{{ dep.headsign }}</h3>
+                                <p style="font-size: 0.85rem; color: #444;">
+                                    <a href="{{ path('web_get_route', {id: dep.route.id}) }}" style="color: inherit;">
+                                        {{ dep.route.longName }}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;">
+                            <div class="departure-time">{{ dep.arrivalTime }}</div>
+                            <div>
+                                {% if dep.expectedInMinutes == 0 %}
+                                    <span class="badge badge-now">ЗАРАЗ</span>
+                                {% elseif dep.expectedInMinutes > 0 %}
+                                    <span class="badge badge-soon">через {{ dep.expectedInMinutes }} хв</span>
+                                {% else %}
+                                    <span class="badge badge-past">{{ dep.expectedInMinutes|abs }} хв тому</span>
+                                {% endif %}
+                            </div>
+                            <div style="margin-top: 0.35rem;">
+                                <a href="{{ path('web_trips', {id: dep.tripId}) }}" class="btn btn-white" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">
+                                    ГРАФІК РЕЙСУ →
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const exactTimePicker = document.getElementById('exactTimePicker');
+        if (exactTimePicker) {
+            exactTimePicker.addEventListener('change', function () {
+                const val = this.value;
+                if (!val) return;
+                const parts = val.split(':');
+                if (parts.length >= 2) {
+                    const target = new Date();
+                    target.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
+
+                    const pad = num => String(num).padStart(2, '0');
+                    const offsetMinutes = -target.getTimezoneOffset();
+                    const sign = offsetMinutes >= 0 ? '+' : '-';
+                    const offH = pad(Math.floor(Math.abs(offsetMinutes) / 60));
+                    const offM = pad(Math.abs(offsetMinutes) % 60);
+                    const atomStr = `${target.getFullYear()}-${pad(target.getMonth() + 1)}-${pad(target.getDate())}T${pad(target.getHours())}:${pad(target.getMinutes())}:00${sign}${offH}:${offM}`;
+
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('time', atomStr);
+                    window.location.href = url.toString();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

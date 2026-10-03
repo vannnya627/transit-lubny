@@ -1,0 +1,122 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Розклад: {{ schedule.name }} | Лубни{% endblock %}
+
+{% block body %}
+<main class="container" hx-boost="true">
+
+    <nav class="breadcrumbs">
+        <a href="{{ path('web_all_routes') }}">← ВСІ МАРШРУТИ</a>
+        <span> / </span>
+        <a href="{{ path('web_stops') }}">ПОШУК ЗУПИНОК</a>
+    </nav>
+
+    <header class="page-header">
+        <span class="badge {{ schedule.direction.value == 1 ? 'badge-forward' : 'badge-return' }}">
+            {{ schedule.direction.getLabel() }}
+        </span>
+        <h1 style="margin-top: 0.5rem;">{{ schedule.name }}</h1>
+        <p class="subtitle">
+            Зупинок у маршруті: <strong>{{ schedule.stops|length }}</strong> |
+            Всього рейсів: <strong>{{ schedule.trips|length }}</strong>
+        </p>
+    </header>
+
+    <section>
+        {% if schedule.stops is empty %}
+            <div class="empty-state">
+                <p><strong>[!] Для цього напрямку зупинок не знайдено.</strong></p>
+            </div>
+        {% elseif schedule.trips is empty %}
+            <div class="empty-state">
+                <p><strong>[!] Рейсів для цього напрямку наразі немає.</strong></p>
+            </div>
+
+            <div class="brut-box">
+                <h3 style="margin-bottom: 0.5rem;">Список зупинок за маршрутом:</h3>
+                <ol style="margin-left: 1.5rem; line-height: 1.8;">
+                    {% for stop in schedule.stops %}
+                        <li>
+                            <a href="{{ path('web_stop', {id: stop.stopId}) }}">{{ stop.name }}</a>
+                        </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        {% else %}
+
+            <div class="table-container">
+                <table class="brut-table">
+                    <thead>
+                        <tr>
+
+                            <th class="col-seq">#</th>
+
+                            <th class="col-stop">ЗУПИНКА</th>
+
+                            {% for trip in schedule.trips %}
+                                <th style="text-align: center;">
+                                    <div>
+                                        <a href="{{ path('web_trips', {id: trip.tripId}) }}"
+                                           title="Відкрити маршрутний лист рейсу #{{ trip.tripId }}"
+                                           style="text-decoration: underline; font-weight: 900;">
+                                            Рейс {{ loop.index }}
+                                        </a>
+                                    </div>
+
+                                    <div style="font-size: 0.75rem; margin-top: 0.2rem; font-weight: normal;">
+                                        {% if trip.serviceDays.monday and trip.serviceDays.tuesday and trip.serviceDays.wednesday and trip.serviceDays.thursday and trip.serviceDays.friday and trip.serviceDays.saturday and trip.serviceDays.sunday %}
+                                            [Щодня]
+                                        {% elseif trip.serviceDays.monday and trip.serviceDays.tuesday and trip.serviceDays.wednesday and trip.serviceDays.thursday and trip.serviceDays.friday and not trip.serviceDays.saturday and not trip.serviceDays.sunday %}
+                                            [Будні]
+                                        {% elseif not trip.serviceDays.monday and not trip.serviceDays.tuesday and not trip.serviceDays.wednesday and not trip.serviceDays.thursday and not trip.serviceDays.friday and trip.serviceDays.saturday and trip.serviceDays.sunday %}
+                                            [Вихідні]
+                                        {% else %}
+                                            {% set days = [] %}
+                                            {% if trip.serviceDays.monday %}{% set days = days|merge(['Пн']) %}{% endif %}
+                                            {% if trip.serviceDays.tuesday %}{% set days = days|merge(['Вт']) %}{% endif %}
+                                            {% if trip.serviceDays.wednesday %}{% set days = days|merge(['Ср']) %}{% endif %}
+                                            {% if trip.serviceDays.thursday %}{% set days = days|merge(['Чт']) %}{% endif %}
+                                            {% if trip.serviceDays.friday %}{% set days = days|merge(['Пт']) %}{% endif %}
+                                            {% if trip.serviceDays.saturday %}{% set days = days|merge(['Сб']) %}{% endif %}
+                                            {% if trip.serviceDays.sunday %}{% set days = days|merge(['Нд']) %}{% endif %}
+                                            [{{ days|join(',') }}]
+                                        {% endif %}
+                                    </div>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stop in schedule.stops %}
+                            <tr>
+                                <td class="col-seq">{{ stop.sequence }}</td>
+
+                                <td class="col-stop">
+                                    <a href="{{ path('web_stop', {id: stop.stopId}) }}">
+                                        {{ stop.name }}
+                                    </a>
+                                    <a href="{{ path('web_stop_departures', {id: stop.stopId}) }}"
+                                       title="Найближчі рейси з зупинки"
+                                       style="text-decoration: none; margin-left: 0.25rem;">
+                                        ⏱️
+                                    </a>
+                                </td>
+
+                                {% for trip in schedule.trips %}
+                                    {% set time = trip.stopTimes[stop.sequence - 1] ?? null %}
+                                    <td style="text-align: center; {{ time ? 'font-weight: bold;' : 'color: #888;' }}">
+                                        {{ time ?: '—' }}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% endif %}
+    </section>
+
+</main>
+{% endblock %}
