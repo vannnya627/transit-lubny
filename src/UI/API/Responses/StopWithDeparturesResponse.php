@@ -12,7 +12,7 @@ final readonly class StopWithDeparturesResponse
     public function __construct(
         public int $stopId,
         public string $stopName,
-        public ?int $cityCode,
+        public int $cityCode,
         public array $departures,
     ) {}
 }

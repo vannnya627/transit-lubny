@@ -11,6 +11,6 @@ final readonly class StopResponse
         public string $name,
         public ?float $lat,
         public ?float $lon,
-        public ?int $cityCode,
+        public int $cityCode,
     ) {}
 }

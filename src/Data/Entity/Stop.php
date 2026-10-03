@@ -28,8 +28,8 @@ final class Stop
     #[ORM\Embedded(class: Coordinates::class, columnPrefix: false)]
     public private(set) Coordinates $coordinates;
 
-    #[ORM\Column(unique: true, nullable: true)]
-    public private(set) ?int $cityCode = null;
+    #[ORM\Column(unique: true)]
+    public private(set) int $cityCode;
 
     #[ORM\Column]
     public private(set) ?DateTimeImmutable $createdAt = null;
@@ -52,7 +52,7 @@ final class Stop
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public static function create(string $name, Coordinates $coordinates, ?int $cityCode = null): self
+    public static function create(string $name, Coordinates $coordinates, int $cityCode): self
     {
         $stop = new self();
         $stop->name = $name;
