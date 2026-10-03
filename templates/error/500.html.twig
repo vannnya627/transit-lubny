@@ -1,0 +1,20 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}500 Помилка сервера | Лубни{% endblock %}
+
+{% block body %}
+<main class="container" hx-boost="true">
+
+    <header class="page-header">
+        <div style="margin-bottom: 0.75rem;">
+            <span class="badge" style="background: #fca5a5;">ПОМИЛКА 500</span>
+        </div>
+        <h1>⚠️ ПОМИЛКА СЕРВЕРА</h1>
+        <p class="subtitle">Виникла неочікувана проблема під час обробки вашого запиту.</p>
+        <p style="margin-bottom: 1rem;">
+            Сервер не зміг обробити цей запит. Спробуйте оновити сторінку або поверніться до каталогу маршрутів.
+        </p>
+    </header>
+</main>
+{% endblock %}
