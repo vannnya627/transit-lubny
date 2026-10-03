@@ -15,6 +15,7 @@ use App\Data\ValueObjects\ServiceDays;
 use App\Enum\Direction;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use LogicException;
 
 class AddRouteFixtures extends Fixture
 {
@@ -38,6 +39,7 @@ class AddRouteFixtures extends Fixture
         $serviceDays = clone new ServiceDays(true, true, true, true, true, true, true);
 
         $uniqueStops = [];
+
         foreach ($data as $routeData) {
             if (!is_array($routeData)) {
                 continue;
@@ -72,6 +74,10 @@ class AddRouteFixtures extends Fixture
 
                     $nameVal = $stopData['name'] ?? '';
                     $name = is_scalar($nameVal) ? (string) $nameVal : '';
+
+                    if (isset($uniqueStops[$code]) && $uniqueStops[$code]['name'] !== $name) {
+                        throw new LogicException(sprintf('Колізія cityCode %d: вже прив’язаний до "%s", але маршрут намагається призначити "%s"', $code, $uniqueStops[$code]['name'], $name));
+                    }
 
                     if (!isset($uniqueStops[$code]) || (0.0 !== $lat && null !== $lat)) {
                         $uniqueStops[$code] = [
