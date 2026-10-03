@@ -17,6 +17,10 @@ docker compose exec -u www-data -w /var/www/project php-fpm composer install
 ```
 docker compose exec php-fpm php bin/console doctrine:migrations:migrate --no-interaction
 ```
+### Run fixtures:
+```
+docker compose exec php-fpm php bin/console doctrine:fixtures:load --no-debug
+```
 ---
 ### Check the documentation: http://localhost/api/doc or http://localhost/api/doc.json 
 ### Check Symfony Profiler: http://localhost/_profiler
