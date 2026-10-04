@@ -75,4 +75,11 @@ final class Trip
 
         return $stopTime;
     }
+
+    public function addStopTime(StopTime $stopTime): void
+    {
+        if (!$this->stopTimes->contains($stopTime)) {
+            $this->stopTimes->add($stopTime);
+        }
+    }
 }

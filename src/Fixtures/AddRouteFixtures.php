@@ -154,12 +154,12 @@ class AddRouteFixtures extends Fixture
 
                         $stopId = $stopEntities[$code]->id;
                         $patternStop = PatternStop::create($pattern, $sequence, $stopId);
-                        $pattern->patternStops->add($patternStop);
+                        $pattern->addPatternStop($patternStop);
                         ++$sequence;
                     }
                 }
 
-                $route->patterns->add($pattern);
+                $route->addPattern($pattern);
                 $manager->persist($route);
                 $manager->flush();
 
@@ -195,7 +195,7 @@ class AddRouteFixtures extends Fixture
                                         $arrivalTime,
                                         false,
                                     );
-                                    $trip->stopTimes->add($stopTime);
+                                    $trip->addStopTime($stopTime);
                                 }
                             }
                         }

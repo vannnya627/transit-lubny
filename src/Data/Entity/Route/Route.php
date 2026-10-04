@@ -69,4 +69,11 @@ final class Route
 
         return $route;
     }
+
+    public function addPattern(Pattern $pattern): void
+    {
+        if (!$this->patterns->contains($pattern)) {
+            $this->patterns->add($pattern);
+        }
+    }
 }

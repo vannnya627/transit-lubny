@@ -73,4 +73,11 @@ final class Pattern
 
         return $pattern;
     }
+
+    public function addPatternStop(PatternStop $patternStop): void
+    {
+        if (!$this->patternStops->contains($patternStop)) {
+            $this->patternStops->add($patternStop);
+        }
+    }
 }
