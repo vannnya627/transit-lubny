@@ -7,7 +7,7 @@ namespace App\Tasks\Stop;
 use App\Data\Entity\Stop;
 use App\Data\Repository\Interfaces\StopRepositoryInterface;
 
-final readonly class FindStopsByIdsTask
+readonly class FindStopsByIdsTask
 {
     public function __construct(
         private StopRepositoryInterface $repository,

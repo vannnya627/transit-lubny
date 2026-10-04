@@ -7,7 +7,7 @@ namespace App\Tasks\Trip;
 use App\Data\Entity\Trip\Trip;
 use App\Data\Repository\Interfaces\TripRepositoryInterface;
 
-final readonly class GetTripByIdTask
+readonly class GetTripByIdTask
 {
     public function __construct(
         private TripRepositoryInterface $repository,

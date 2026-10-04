@@ -8,7 +8,7 @@ use App\Data\Entity\Stop;
 use App\Data\Repository\Interfaces\StopRepositoryInterface;
 use App\DTOs\Input\SearchStopsInput;
 
-final readonly class FindStopsBySearchQueryTask
+readonly class FindStopsBySearchQueryTask
 {
     public function __construct(
         private StopRepositoryInterface $repository,

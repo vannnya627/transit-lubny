@@ -7,7 +7,7 @@ namespace App\Tasks\Route;
 use App\Data\Entity\Route\Pattern;
 use App\Data\Repository\Interfaces\RouteRepositoryInterface;
 
-final readonly class GetPatternWithRouteByPatternIdTask
+readonly class GetPatternWithRouteByPatternIdTask
 {
     public function __construct(
         public RouteRepositoryInterface $routeRepository,
