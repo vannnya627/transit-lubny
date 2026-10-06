@@ -2,36 +2,42 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Actions\Stop;
+namespace App\Tests\Unit\Actions\Stop;
 
-use App\Actions\Stop\GetStopAction;
+use App\Actions\Stop\GetStopsAction;
 use App\Data\Entity\Stop;
 use App\Data\ValueObjects\Coordinates;
+use App\DTOs\Input\SearchStopsInput;
 use App\DTOs\StopDTO;
-use App\Tasks\Stop\GetStopByIdTask;
+use App\Tasks\Stop\FindStopsBySearchQueryTask;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionException;
 
 #[AllowMockObjectsWithoutExpectations]
-class GetStopActionTest extends AbstractTestCase
+class GetStopsActionTest extends AbstractTestCase
 {
-    private GetStopByIdTask|MockObject $getStopByIdTask;
-
-    private GetStopAction $action;
+    private FindStopsBySearchQueryTask|MockObject $findStopsBySearchQueryTask;
+    private GetStopsAction $action;
 
     protected function setUp(): void
     {
-        $this->getStopByIdTask = $this->createMock(GetStopByIdTask::class);
-        $this->action = new GetStopAction($this->getStopByIdTask);
+        $this->findStopsBySearchQueryTask = $this->createMock(FindStopsBySearchQueryTask::class);
+        $this->action = new GetStopsAction(
+            $this->findStopsBySearchQueryTask,
+        );
     }
 
     /**
      * @throws ReflectionException
      */
-    public function testRun(): void
+    public function testRun()
     {
+        $input = new SearchStopsInput(
+            q: 'test',
+        );
+
         $stopId = 1;
         $stop = Stop::create(
             name: 'test',
@@ -40,10 +46,10 @@ class GetStopActionTest extends AbstractTestCase
         );
         $this->setEntityId($stop, $stopId);
 
-        $this->getStopByIdTask->expects($this->once())
+        $this->findStopsBySearchQueryTask->expects($this->once())
             ->method('run')
-            ->with($stopId)
-            ->willReturn($stop);
+            ->with($input)
+            ->willReturn([$stop]);
 
         $expected = new StopDTO(
             id: $stop->id,
@@ -51,7 +57,7 @@ class GetStopActionTest extends AbstractTestCase
             coordinates: $stop->coordinates,
             cityCode: $stop->cityCode,
         );
-        $result = $this->action->run($stopId);
-        $this->assertEquals($expected, $result);
+        $result = $this->action->run($input);
+        $this->assertEquals([$expected], $result);
     }
 }

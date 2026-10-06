@@ -2,28 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Tasks\Stop;
+namespace App\Tests\Unit\Tasks\Stop;
 
 use App\Data\Entity\Stop;
 use App\Data\Repository\Interfaces\StopRepositoryInterface;
 use App\Data\ValueObjects\Coordinates;
-use App\DTOs\Input\SearchStopsInput;
-use App\Tasks\Stop\FindStopsBySearchQueryTask;
+use App\Tasks\Stop\FindStopsByIdsTask;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionException;
 
 #[AllowMockObjectsWithoutExpectations]
-class FindStopsBySearchQueryTaskTest extends AbstractTestCase
+class FindStopsByIdsTaskTest extends AbstractTestCase
 {
     private StopRepositoryInterface|MockObject $repository;
-    private FindStopsBySearchQueryTask $task;
+    private FindStopsByIdsTask $task;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(StopRepositoryInterface::class);
-        $this->task = new FindStopsBySearchQueryTask($this->repository);
+        $this->task = new FindStopsByIdsTask($this->repository);
     }
 
     /**
@@ -31,9 +30,6 @@ class FindStopsBySearchQueryTaskTest extends AbstractTestCase
      */
     public function testRun()
     {
-        $input = new SearchStopsInput(
-            q: 'test',
-        );
         $stopId = 1;
         $stop = Stop::create(
             name: 'test',
@@ -43,11 +39,11 @@ class FindStopsBySearchQueryTaskTest extends AbstractTestCase
         $this->setEntityId($stop, $stopId);
 
         $this->repository->expects($this->once())
-            ->method('findStopsBySearchQuery')
-            ->with($input)
+            ->method('findStopsByIds')
+            ->with([$stopId])
             ->willReturn([$stop]);
 
-        $result = $this->task->run($input);
+        $result = $this->task->run([$stopId]);
         $this->assertEquals([$stop], $result);
 
     }

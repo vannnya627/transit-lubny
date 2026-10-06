@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Tasks\Trip;
+namespace App\Tests\Unit\Tasks\Trip;
 
 use App\Data\Entity\Trip\Trip;
 use App\Data\Repository\Interfaces\TripRepositoryInterface;

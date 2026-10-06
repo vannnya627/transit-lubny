@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Tasks\Trip;
+namespace App\Tests\Unit\Tasks\Trip;
 
 use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\PatternStop;
@@ -10,24 +10,23 @@ use App\Data\Entity\Route\Route;
 use App\Data\Entity\Trip\Trip;
 use App\Data\Repository\Interfaces\TripRepositoryInterface;
 use App\Data\ValueObjects\ServiceDays;
-use App\DTOs\Input\GetStopDeparturesInput;
 use App\Enum\Direction;
-use App\Tasks\Trip\FindTripsWithStopTimesForStopTask;
+use App\Tasks\Trip\FindTripsWithStopTimesByPatternIdTask;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionException;
 
 #[AllowMockObjectsWithoutExpectations]
-class FindTripsWithStopTimesForStopTaskTest extends AbstractTestCase
+class FindTripsWithStopTimesByPatternIdTaskTest extends AbstractTestCase
 {
     private TripRepositoryInterface|MockObject $repository;
-    private FindTripsWithStopTimesForStopTask $task;
+    private FindTripsWithStopTimesByPatternIdTask $task;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(TripRepositoryInterface::class);
-        $this->task = new FindTripsWithStopTimesForStopTask($this->repository);
+        $this->task = new FindTripsWithStopTimesByPatternIdTask($this->repository);
     }
 
     /**
@@ -35,10 +34,8 @@ class FindTripsWithStopTimesForStopTaskTest extends AbstractTestCase
      */
     public function testRun()
     {
-        $input = new GetStopDeparturesInput(
-            1,
-        );
         $routeId = 1;
+
         $route = Route::create(shortName: '1', longName: 'test');
         $this->setEntityId($route, $routeId);
 
@@ -65,11 +62,11 @@ class FindTripsWithStopTimesForStopTaskTest extends AbstractTestCase
         $this->setEntityId($trip, $tripId);
 
         $this->repository->expects($this->once())
-            ->method('findTripsWithStopTimesForStop')
-            ->with($input)
+            ->method('findTripsWithStopTimes')
+            ->with($patternId)
             ->willReturn([$trip]);
 
-        $result = $this->task->run($input);
+        $result = $this->task->run($patternId);
         $this->assertEquals([$trip], $result);
     }
 }

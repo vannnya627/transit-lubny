@@ -24,9 +24,9 @@ final class GetRouteController extends AbstractController
     ) {}
 
     #[OA\Get(
-        operationId: 'web_all_routes',
-        description: 'Отримання списку усіх маршруток',
-        summary: 'Отримання списку маршруток',
+        operationId: 'web_get_route',
+        description: 'Отримання певного маршруту',
+        summary: 'Отримання маршруту',
     )]
     #[OA\Response(
         response: 200,

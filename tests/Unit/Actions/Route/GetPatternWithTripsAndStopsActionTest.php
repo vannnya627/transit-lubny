@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Actions\Route;
+namespace App\Tests\Unit\Actions\Route;
 
 use App\Actions\Route\GetPatternWithTripsAndStopsAction;
 use App\Data\Entity\Route\Pattern;

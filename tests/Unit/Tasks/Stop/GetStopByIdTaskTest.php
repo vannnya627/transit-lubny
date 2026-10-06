@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Tasks\Stop;
+namespace App\Tests\Unit\Tasks\Stop;
 
 use App\Data\Entity\Stop;
 use App\Data\Repository\Interfaces\StopRepositoryInterface;
