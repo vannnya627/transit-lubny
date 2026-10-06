@@ -10,7 +10,7 @@ docker compose up -d
 ---
 ### Install PHP dependencies:
 ```
-docker compose exec -u www-data -w /var/www/project php-fpm composer install
+docker compose exec php-fpm composer install
 ```
 ---
 ### Run database migrations:
