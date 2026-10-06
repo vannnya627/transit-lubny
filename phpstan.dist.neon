@@ -8,3 +8,6 @@ parameters:
         #- public/
         - src/
         #- tests/
+    excludePaths:
+            analyseAndScan:
+                - src/Kernel.php

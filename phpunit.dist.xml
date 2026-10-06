@@ -39,6 +39,12 @@
             <method>Doctrine\Deprecations\Deprecation::delegateTriggerToBackend</method>
             <function>trigger_deprecation</function>
         </deprecationTrigger>
+
+        <exclude>
+            <directory>src/Fixtures</directory>
+            <file>src/Kernel.php</file>
+        </exclude>
+
     </source>
 
     <extensions>
