@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\UI\WEB\Controllers\Stop;
 
 use App\Actions\Stop\GetStopsAction;
-use App\UI\WEB\Requests\StopQueryParameter;
+use App\UI\WEB\Requests\QueryParameters\StopQueryParameter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UI\WEB\Requests;
+namespace App\UI\WEB\Requests\QueryParameters;
 
 use App\Data\ValueObjects\Coordinates;
 use App\DTOs\Input\SearchStopsInput;

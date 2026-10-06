@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\UI\API\Requests;
+namespace App\UI\API\Requests\QueryParameters;
 
 use App\DTOs\Input\GetStopDeparturesInput;
+use DateTimeImmutable;
+use DateTimeInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Validator\Constraints as Assert;
-use DateTimeImmutable;
-use DateTimeInterface;
 
 final readonly class DeparturesQueryParameter
 {

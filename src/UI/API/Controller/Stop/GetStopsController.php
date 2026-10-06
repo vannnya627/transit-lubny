@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\UI\API\Controller\Stop;
 
 use App\Actions\Stop\GetStopsAction;
-use App\UI\API\Requests\StopQueryParameter;
+use App\UI\API\Requests\QueryParameters\StopQueryParameter;
 use App\UI\API\Responses\StopResponse;
 use App\UI\API\Transformers\StopTransformer;
 use Nelmio\ApiDocBundle\Attribute\Model;
