@@ -12,6 +12,7 @@ RUN install-php-extensions \
     sockets \
     excimer \
     pcov \
+    redis \
     @composer
 
 WORKDIR /app
