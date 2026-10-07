@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Trip;
 
-use App\Caching\Interfaces\CacheInterface;
+use App\Caching\TripCache;
 use App\Data\Entity\Stop;
 use App\Data\Entity\Trip\StopTime;
 use App\DTOs\RouteDTO;
@@ -16,7 +16,6 @@ use App\Tasks\Stop\FindStopsByIdsTask;
 use App\Tasks\Trip\GetTripByIdTask;
 use DateTimeImmutable;
 use DateTimeZone;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class GetTripAction
 {
@@ -24,16 +23,13 @@ final readonly class GetTripAction
         private GetTripByIdTask $getTripByIdTask,
         private GetPatternWithRouteByPatternIdTask $getPatternWithRouteByPatternIdTask,
         private FindStopsByIdsTask $findStopsByIdsTask,
-        private CacheInterface $cache,
-        #[Autowire(param: 'app.cache_ttl')]
-        private int $ttlMinutes,
+        private TripCache $cache,
     ) {}
 
     public function run(int $tripId, ?DateTimeImmutable $now = null): TripDetailsDTO
     {
         return $this->cache->get(
             key: "trip.$tripId",
-            ttlMinutes: $this->ttlMinutes,
             callback: function () use ($tripId, $now) {
                 $trip = $this->getTripByIdTask->run($tripId);
                 $pattern = $this->getPatternWithRouteByPatternIdTask->run($trip->patternId);

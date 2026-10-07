@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Actions\Route;
 
 use App\Actions\Route\GetPatternWithTripsAndStopsAction;
-use App\Caching\Interfaces\CacheInterface;
+use App\Caching\RouteCache;
 use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
@@ -32,7 +32,7 @@ class GetPatternWithTripsAndStopsActionTest extends AbstractTestCase
     private GetPatternByIdTask|MockObject $getPatternByIdTask;
     private FindStopsByIdsTask|MockObject $findStopsByIdsTask;
     private FindTripsWithStopTimesByPatternIdTask|MockObject $findTripsWithStopTimesByPatternIdTask;
-    private CacheInterface|MockObject $cache;
+    private RouteCache|MockObject $cache;
     private GetPatternWithTripsAndStopsAction $action;
 
     protected function setUp(): void
@@ -40,13 +40,12 @@ class GetPatternWithTripsAndStopsActionTest extends AbstractTestCase
         $this->getPatternByIdTask = $this->createMock(GetPatternByIdTask::class);
         $this->findStopsByIdsTask = $this->createMock(FindStopsByIdsTask::class);
         $this->findTripsWithStopTimesByPatternIdTask = $this->createMock(FindTripsWithStopTimesByPatternIdTask::class);
-        $this->cache = $this->createMock(CacheInterface::class);
+        $this->cache = $this->createMock(RouteCache::class);
         $this->action = new GetPatternWithTripsAndStopsAction(
             $this->getPatternByIdTask,
             $this->findStopsByIdsTask,
             $this->findTripsWithStopTimesByPatternIdTask,
             $this->cache,
-            $ttlMinutes = 3600,
         );
     }
 
@@ -102,7 +101,7 @@ class GetPatternWithTripsAndStopsActionTest extends AbstractTestCase
 
         $this->cache->expects($this->once())
             ->method('get')
-            ->willReturnCallback(function (string $key, int $ttlMinutes, callable $callback) use ($pattern) {
+            ->willReturnCallback(function (string $key, callable $callback) use ($pattern) {
                 $this->assertEquals("pattern.$pattern->id", $key);
 
                 return $callback();

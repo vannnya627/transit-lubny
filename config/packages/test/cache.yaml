@@ -1,4 +1,10 @@
 framework:
     cache:
         prefix_seed: marshrutka_lubny
-        app: cache.adapter.array
+        pools:
+            route.cache:
+                adapter: cache.adapter.array
+            stop.cache:
+                adapter: cache.adapter.array
+            trip.cache:
+                adapter: cache.adapter.array

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Route;
 
-use App\Caching\Interfaces\CacheInterface;
+use App\Caching\RouteCache;
 use App\Data\Entity\Stop;
 use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
@@ -14,7 +14,6 @@ use App\DTOs\TripDTO;
 use App\Tasks\Route\GetPatternByIdTask;
 use App\Tasks\Stop\FindStopsByIdsTask;
 use App\Tasks\Trip\FindTripsWithStopTimesByPatternIdTask;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class GetPatternWithTripsAndStopsAction
 {
@@ -22,16 +21,13 @@ final readonly class GetPatternWithTripsAndStopsAction
         private GetPatternByIdTask $getPatternByIdTask,
         private FindStopsByIdsTask $findStopsByIdsTask,
         private FindTripsWithStopTimesByPatternIdTask $findTripsWithStopTimesByPatternIdTask,
-        private CacheInterface $cache,
-        #[Autowire(param: 'app.cache_ttl')]
-        private int $ttlMinutes,
+        private RouteCache $cache,
     ) {}
 
     public function run(int $patternId): PatternWithStopsAndTripsDTO
     {
         return $this->cache->get(
             key: "pattern.$patternId",
-            ttlMinutes: $this->ttlMinutes,
             callback: function () use ($patternId): PatternWithStopsAndTripsDTO {
                 $pattern = $this->getPatternByIdTask->run($patternId);
 

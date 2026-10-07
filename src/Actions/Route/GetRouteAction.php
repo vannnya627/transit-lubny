@@ -4,27 +4,23 @@ declare(strict_types=1);
 
 namespace App\Actions\Route;
 
-use App\Caching\Interfaces\CacheInterface;
+use App\Caching\RouteCache;
 use App\Data\Entity\Route\Pattern;
 use App\DTOs\PatternDTO;
 use App\DTOs\RouteWithPatternsDTO;
 use App\Tasks\Route\GetRouteTask;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class GetRouteAction
 {
     public function __construct(
         private GetRouteTask $getRouteTask,
-        private CacheInterface $cache,
-        #[Autowire(param: 'app.cache_ttl')]
-        private int $ttlMinutes,
+        private RouteCache $cache,
     ) {}
 
     public function run(int $routeId): RouteWithPatternsDTO
     {
         return $this->cache->get(
             key: "routes.$routeId",
-            ttlMinutes: $this->ttlMinutes,
             callback: function () use ($routeId): RouteWithPatternsDTO {
                 $route = $this->getRouteTask->run($routeId);
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Actions\Stop;
 
 use App\Actions\Stop\GetStopDeparturesAction;
-use App\Caching\Interfaces\CacheInterface;
+use App\Caching\StopCache;
 use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
@@ -33,7 +33,7 @@ class GetStopDeparturesActionTest extends AbstractTestCase
     private FindTripsWithStopTimesForStopTask|MockObject $findTripsWithStopTimesForStopTask;
     private FindPatternsWithRoutesByIdsTask|MockObject $findPatternsWithRoutesByIds;
     private GetStopByIdTask|MockObject $getStopByIdTask;
-    private CacheInterface|MockObject $cache;
+    private StopCache|MockObject $cache;
 
     private GetStopDeparturesAction $action;
 
@@ -42,13 +42,12 @@ class GetStopDeparturesActionTest extends AbstractTestCase
         $this->findTripsWithStopTimesForStopTask = $this->createMock(FindTripsWithStopTimesForStopTask::class);
         $this->findPatternsWithRoutesByIds = $this->createMock(FindPatternsWithRoutesByIdsTask::class);
         $this->getStopByIdTask = $this->createMock(GetStopByIdTask::class);
-        $this->cache = $this->createMock(CacheInterface::class);
+        $this->cache = $this->createMock(StopCache::class);
         $this->action = new GetStopDeparturesAction(
             $this->findTripsWithStopTimesForStopTask,
             $this->findPatternsWithRoutesByIds,
             $this->getStopByIdTask,
             $this->cache,
-            $ttlMinutes = 3600,
         );
     }
 
@@ -107,7 +106,7 @@ class GetStopDeparturesActionTest extends AbstractTestCase
 
         $this->cache->expects($this->once())
             ->method('get')
-            ->willReturnCallback(function (string $key, int $ttlMinutes, callable $callback) use ($input) {
+            ->willReturnCallback(function (string $key, callable $callback) use ($input) {
                 $this->assertEquals("stop.$input->stopId.with.departures", $key);
 
                 return $callback();

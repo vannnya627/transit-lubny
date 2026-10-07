@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Actions\Route;
 
 use App\Actions\Route\GetAllRouteAction;
-use App\Caching\Interfaces\CacheInterface;
+use App\Caching\RouteCache;
 use App\Data\Entity\Route\Route;
 use App\DTOs\RouteDTO;
 use App\Tasks\Route\GetAllRouteTask;
@@ -18,19 +18,18 @@ use ReflectionException;
 class GetAllRouteActionTest extends AbstractTestCase
 {
     private GetAllRouteTask|MockObject $getAllRouteTask;
-    private CacheInterface|MockObject $cache;
+    private RouteCache|MockObject $cache;
     private GetAllRouteAction $getAllRouteAction;
 
     public function setUp(): void
     {
         $this->getAllRouteTask = $this->createMock(GetAllRouteTask::class);
-        $this->cache = $this->createMock(CacheInterface::class);
+        $this->cache = $this->createMock(RouteCache::class);
 
 
         $this->getAllRouteAction = new GetAllRouteAction(
             $this->getAllRouteTask,
             $this->cache,
-            $ttlMinutes = 3600,
         );
     }
 
@@ -45,7 +44,7 @@ class GetAllRouteActionTest extends AbstractTestCase
 
         $this->cache->expects($this->once())
             ->method('get')
-            ->willReturnCallback(function (string $key, int $ttlMinutes, callable $callback) {
+            ->willReturnCallback(function (string $key, callable $callback) {
                 $this->assertEquals('routes', $key);
 
                 return $callback();
@@ -69,7 +68,7 @@ class GetAllRouteActionTest extends AbstractTestCase
     {
         $this->cache->expects($this->once())
             ->method('get')
-            ->willReturnCallback(function (string $key, int $ttlMinutes, callable $callback) {
+            ->willReturnCallback(function (string $key, callable $callback) {
                 $this->assertEquals('routes', $key);
 
                 return $callback();

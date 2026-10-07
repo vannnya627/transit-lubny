@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Actions\Trip;
 
 use App\Actions\Trip\GetTripAction;
-use App\Caching\Interfaces\CacheInterface;
+use App\Caching\TripCache;
 use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
@@ -26,6 +26,8 @@ use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionException;
+use DateTimeImmutable;
+use DateTimeZone;
 
 #[AllowMockObjectsWithoutExpectations]
 class GetTripActionTest extends AbstractTestCase
@@ -33,7 +35,7 @@ class GetTripActionTest extends AbstractTestCase
     private GetTripByIdTask|MockObject $getTripByIdTask;
     private GetPatternWithRouteByPatternIdTask|MockObject $getPatternWithRouteByPatternIdTask;
     private FindStopsByIdsTask|MockObject $findStopsByIdsTask;
-    private CacheInterface|MockObject $cache;
+    private TripCache|MockObject $cache;
     private GetTripAction $action;
 
     protected function setUp(): void
@@ -41,13 +43,12 @@ class GetTripActionTest extends AbstractTestCase
         $this->getTripByIdTask = $this->createMock(GetTripByIdTask::class);
         $this->getPatternWithRouteByPatternIdTask = $this->createMock(GetPatternWithRouteByPatternIdTask::class);
         $this->findStopsByIdsTask = $this->createMock(FindStopsByIdsTask::class);
-        $this->cache = $this->createMock(CacheInterface::class);
+        $this->cache = $this->createMock(TripCache::class);
         $this->action = new GetTripAction(
             $this->getTripByIdTask,
             $this->getPatternWithRouteByPatternIdTask,
             $this->findStopsByIdsTask,
             $this->cache,
-            $ttlMinutes = 3600,
         );
     }
 
@@ -102,7 +103,7 @@ class GetTripActionTest extends AbstractTestCase
 
         $this->cache->expects($this->once())
             ->method('get')
-            ->willReturnCallback(function (string $key, int $ttlMinutes, callable $callback) use ($trip) {
+            ->willReturnCallback(function (string $key, callable $callback) use ($trip) {
                 $this->assertEquals("trip.$trip->id", $key);
 
                 return $callback($trip);
@@ -141,8 +142,8 @@ class GetTripActionTest extends AbstractTestCase
             headsign: $pattern->name,
             stops: [$stopForTripDTOs],
         );
-
-        $result = $this->action->run($tripId);
+        $fixedTime = new DateTimeImmutable('2024-01-01 12:00:00', new DateTimeZone('Europe/Kyiv'));
+        $result = $this->action->run($tripId, $fixedTime);
         $this->assertEquals($expected, $result);
     }
 }

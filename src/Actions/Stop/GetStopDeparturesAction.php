@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Stop;
 
-use App\Caching\Interfaces\CacheInterface;
+use App\Caching\StopCache;
 use App\Data\Entity\Trip\Trip;
 use App\DTOs\DepartureDTO;
 use App\DTOs\Input\GetStopDeparturesInput;
@@ -13,7 +13,6 @@ use App\DTOs\StopWithDeparturesDTO;
 use App\Tasks\Route\FindPatternsWithRoutesByIdsTask;
 use App\Tasks\Stop\GetStopByIdTask;
 use App\Tasks\Trip\FindTripsWithStopTimesForStopTask;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class GetStopDeparturesAction
 {
@@ -21,9 +20,7 @@ final readonly class GetStopDeparturesAction
         private FindTripsWithStopTimesForStopTask $findTripsWithStopTimesForStopTask,
         private FindPatternsWithRoutesByIdsTask $findPatternsWithRoutesByIds,
         private GetStopByIdTask $getStopByIdTask,
-        private CacheInterface $cache,
-        #[Autowire(param: 'app.cache_ttl')]
-        private int $ttlMinutes,
+        private StopCache $cache,
     ) {}
 
     public function run(GetStopDeparturesInput $input): StopWithDeparturesDTO
@@ -31,7 +28,6 @@ final readonly class GetStopDeparturesAction
 
         return $this->cache->get(
             key: "stop.$input->stopId.with.departures",
-            ttlMinutes: $this->ttlMinutes,
             callback: function () use ($input) {
 
                 // todo - тут знаходжу зупинку щоб взяти тільки з неї імя, можливо змінити
