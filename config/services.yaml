@@ -13,6 +13,8 @@ parameters:
         App\Exceptions\Exception\StopNotFoundException: { type: 'stop-not-found', code: 404, loggable: false }
         App\Exceptions\Exception\TripNotFoundException: { type: 'trip-not-found', code: 404, loggable: false }
 
+    app.cache_ttl: 3600
+
 services:
     # default configuration for services in *this* file
     _defaults:
