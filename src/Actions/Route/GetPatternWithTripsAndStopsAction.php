@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Route;
 
+use App\Caching\Interfaces\CacheInterface;
 use App\Data\Entity\Stop;
 use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
@@ -13,6 +14,7 @@ use App\DTOs\TripDTO;
 use App\Tasks\Route\GetPatternByIdTask;
 use App\Tasks\Stop\FindStopsByIdsTask;
 use App\Tasks\Trip\FindTripsWithStopTimesByPatternIdTask;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class GetPatternWithTripsAndStopsAction
 {
@@ -20,54 +22,62 @@ final readonly class GetPatternWithTripsAndStopsAction
         private GetPatternByIdTask $getPatternByIdTask,
         private FindStopsByIdsTask $findStopsByIdsTask,
         private FindTripsWithStopTimesByPatternIdTask $findTripsWithStopTimesByPatternIdTask,
+        private CacheInterface $cache,
+        #[Autowire(param: 'app.cache_ttl')]
+        private int $ttlMinutes,
     ) {}
 
     public function run(int $patternId): PatternWithStopsAndTripsDTO
     {
-        $pattern = $this->getPatternByIdTask->run($patternId);
+        return $this->cache->get(
+            key: "pattern.$patternId",
+            ttlMinutes: $this->ttlMinutes,
+            callback: function () use ($patternId): PatternWithStopsAndTripsDTO {
+                $pattern = $this->getPatternByIdTask->run($patternId);
 
-        $patternStops = array_values($pattern->patternStops->toArray());
-        usort($patternStops, static fn($a, $b): int => $a->stopSequence <=> $b->stopSequence);
-        $stopIds = array_column($patternStops, 'stopId');
+                $patternStops = array_values($pattern->patternStops->toArray());
+                usort($patternStops, static fn($a, $b): int => $a->stopSequence <=> $b->stopSequence);
+                $stopIds = array_column($patternStops, 'stopId');
 
-        $stops = $this->findStopsByIdsTask->run($stopIds);
-        $trips = $this->findTripsWithStopTimesByPatternIdTask->run($patternId);
+                $stops = $this->findStopsByIdsTask->run($stopIds);
+                $trips = $this->findTripsWithStopTimesByPatternIdTask->run($patternId);
 
-        $stopsForScheduleDTOs = array_map(
-            fn(Stop $stop, $patternStop): StopForScheduleDTO => new StopForScheduleDTO(
-                sequence: $patternStop->stopSequence,
-                stopId: $stop->id,
-                name: $stop->name,
-            ),
-            $stops,
-            $patternStops,
+                $stopsForScheduleDTOs = array_map(
+                    fn(Stop $stop, $patternStop): StopForScheduleDTO => new StopForScheduleDTO(
+                        sequence: $patternStop->stopSequence,
+                        stopId: $stop->id,
+                        name: $stop->name,
+                    ),
+                    $stops,
+                    $patternStops,
+                );
+
+                $tripsDTOs = array_map(function (Trip $trip): TripDTO {
+
+                    $stopTimes = array_values($trip->stopTimes->toArray());
+                    $stopTimesStr = $this->getStopTimeStr($stopTimes);
+
+                    return new TripDTO(
+                        tripId: $trip->id,
+                        serviceDays: $trip->serviceDays,
+                        stopTimes: $stopTimesStr,
+                    );
+                }, $trips);
+
+                usort(
+                    $tripsDTOs,
+                    static fn(TripDTO $a, TripDTO $b): int => ($a->stopTimes[0] ?? '') <=> ($b->stopTimes[0] ?? ''),
+                );
+
+                return new PatternWithStopsAndTripsDTO(
+                    id: $pattern->id,
+                    direction: $pattern->direction,
+                    name: $pattern->name,
+                    stops: $stopsForScheduleDTOs,
+                    trips: $tripsDTOs,
+                );
+            },
         );
-
-        $tripsDTOs = array_map(function (Trip $trip): TripDTO {
-
-            $stopTimes = array_values($trip->stopTimes->toArray());
-            $stopTimesStr = $this->getStopTimeStr($stopTimes);
-
-            return new TripDTO(
-                tripId: $trip->id,
-                serviceDays: $trip->serviceDays,
-                stopTimes: $stopTimesStr,
-            );
-        }, $trips);
-
-        usort(
-            $tripsDTOs,
-            static fn(TripDTO $a, TripDTO $b): int => ($a->stopTimes[0] ?? '') <=> ($b->stopTimes[0] ?? ''),
-        );
-
-        return new PatternWithStopsAndTripsDTO(
-            id: $pattern->id,
-            direction: $pattern->direction,
-            name: $pattern->name,
-            stops: $stopsForScheduleDTOs,
-            trips: $tripsDTOs,
-        );
-
     }
 
     /**
