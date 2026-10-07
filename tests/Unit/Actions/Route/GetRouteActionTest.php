@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Actions\Route;
 
 use App\Actions\Route\GetRouteAction;
+use App\Caching\Interfaces\CacheInterface;
 use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\Route;
 use App\DTOs\PatternDTO;
@@ -20,13 +21,17 @@ use ReflectionException;
 class GetRouteActionTest extends AbstractTestCase
 {
     private GetRouteTask|MockObject $getRouteTask;
+    private CacheInterface|MockObject $cache;
     private GetRouteAction $getRouteAction;
 
     public function setUp(): void
     {
         $this->getRouteTask = $this->createMock(GetRouteTask::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->getRouteAction = new GetRouteAction(
             $this->getRouteTask,
+            $this->cache,
+            $ttlMinutes = 3600,
         );
     }
 
@@ -49,6 +54,14 @@ class GetRouteActionTest extends AbstractTestCase
         $this->setEntityId($pattern, $patternId);
 
         $route->addPattern($pattern);
+
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->willReturnCallback(function (string $key, int $ttlMinutes, callable $callback) use ($route) {
+                $this->assertEquals("routes.$route->id", $key);
+
+                return $callback();
+            });
 
         $this->getRouteTask->expects($this->once())
             ->method('run')

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Actions\Trip;
 
 use App\Actions\Trip\GetTripAction;
+use App\Caching\Interfaces\CacheInterface;
 use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
@@ -32,6 +33,7 @@ class GetTripActionTest extends AbstractTestCase
     private GetTripByIdTask|MockObject $getTripByIdTask;
     private GetPatternWithRouteByPatternIdTask|MockObject $getPatternWithRouteByPatternIdTask;
     private FindStopsByIdsTask|MockObject $findStopsByIdsTask;
+    private CacheInterface|MockObject $cache;
     private GetTripAction $action;
 
     protected function setUp(): void
@@ -39,10 +41,13 @@ class GetTripActionTest extends AbstractTestCase
         $this->getTripByIdTask = $this->createMock(GetTripByIdTask::class);
         $this->getPatternWithRouteByPatternIdTask = $this->createMock(GetPatternWithRouteByPatternIdTask::class);
         $this->findStopsByIdsTask = $this->createMock(FindStopsByIdsTask::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->action = new GetTripAction(
             $this->getTripByIdTask,
             $this->getPatternWithRouteByPatternIdTask,
             $this->findStopsByIdsTask,
+            $this->cache,
+            $ttlMinutes = 3600,
         );
     }
 
@@ -94,6 +99,14 @@ class GetTripActionTest extends AbstractTestCase
             isEstimate: true,
         );
         $trip->addStopTime($stopTime);
+
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->willReturnCallback(function (string $key, int $ttlMinutes, callable $callback) use ($trip) {
+                $this->assertEquals("trip.$trip->id", $key);
+
+                return $callback($trip);
+            });
 
         $this->getTripByIdTask->expects($this->once())
             ->method('run')

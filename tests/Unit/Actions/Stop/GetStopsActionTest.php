@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Actions\Stop;
 
 use App\Actions\Stop\GetStopsAction;
+use App\Caching\Interfaces\CacheInterface;
 use App\Data\Entity\Stop;
 use App\Data\ValueObjects\Coordinates;
 use App\DTOs\Input\SearchStopsInput;
@@ -19,13 +20,17 @@ use ReflectionException;
 class GetStopsActionTest extends AbstractTestCase
 {
     private FindStopsBySearchQueryTask|MockObject $findStopsBySearchQueryTask;
+    private CacheInterface|MockObject $cache;
     private GetStopsAction $action;
 
     protected function setUp(): void
     {
         $this->findStopsBySearchQueryTask = $this->createMock(FindStopsBySearchQueryTask::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->action = new GetStopsAction(
             $this->findStopsBySearchQueryTask,
+            $this->cache,
+            $ttlMinutes = 3600,
         );
     }
 
@@ -45,6 +50,14 @@ class GetStopsActionTest extends AbstractTestCase
             cityCode: 1,
         );
         $this->setEntityId($stop, $stopId);
+
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->willReturnCallback(function (string $key, int $ttlMinutes, callable $callback) {
+                $this->assertEquals('stops', $key);
+
+                return $callback();
+            });
 
         $this->findStopsBySearchQueryTask->expects($this->once())
             ->method('run')

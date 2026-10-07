@@ -1,0 +1,4 @@
+framework:
+    cache:
+        prefix_seed: marshrutka_lubny
+        app: cache.adapter.array

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Actions\Stop;
 
 use App\Actions\Stop\GetStopAction;
+use App\Caching\Interfaces\CacheInterface;
 use App\Data\Entity\Stop;
 use App\Data\ValueObjects\Coordinates;
 use App\DTOs\StopDTO;
@@ -18,13 +19,18 @@ use ReflectionException;
 class GetStopActionTest extends AbstractTestCase
 {
     private GetStopByIdTask|MockObject $getStopByIdTask;
-
+    private CacheInterface|MockObject $cache;
     private GetStopAction $action;
 
     protected function setUp(): void
     {
         $this->getStopByIdTask = $this->createMock(GetStopByIdTask::class);
-        $this->action = new GetStopAction($this->getStopByIdTask);
+        $this->cache = $this->createMock(CacheInterface::class);
+        $this->action = new GetStopAction(
+            $this->getStopByIdTask,
+            $this->cache,
+            $ttlMinutes = 3600,
+        );
     }
 
     /**
@@ -39,6 +45,14 @@ class GetStopActionTest extends AbstractTestCase
             cityCode: 1,
         );
         $this->setEntityId($stop, $stopId);
+
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->willReturnCallback(function (string $key, int $ttlMinutes, callable $callback) use ($stop) {
+                $this->assertEquals("stop.$stop->id", $key);
+
+                return $callback();
+            });
 
         $this->getStopByIdTask->expects($this->once())
             ->method('run')
