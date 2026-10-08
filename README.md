@@ -1,6 +1,6 @@
 ### Clone project:
 ```
-git clone https://github.com/vannnya627/marshrutka-lubny.git
+git clone https://github.com/vannnya627/transit-lubny.git
 ```
 ---
 ### Start Docker containers:
