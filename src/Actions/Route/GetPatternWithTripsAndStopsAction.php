@@ -44,11 +44,7 @@ final readonly class GetPatternWithTripsAndStopsAction
                     $stopTimes = array_values($trip->stopTimes->toArray());
                     $stopTimesStr = $this->getStopTimeStr($stopTimes);
 
-                    return new TripDTO(
-                        tripId: $trip->id,
-                        serviceDays: $trip->serviceDays,
-                        stopTimes: $stopTimesStr,
-                    );
+                    return TripDTO::create(trip: $trip, stopTimeStr: $stopTimesStr);
                 }, $trips);
 
                 usort(
