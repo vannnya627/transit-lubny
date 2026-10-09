@@ -66,11 +66,7 @@ class GetRouteActionTest extends AbstractTestCase
             ->method('run')
             ->willReturn($route);
 
-        $patternDTO = new PatternDTO(
-            id: $pattern->id,
-            direction: $pattern->direction,
-            name: $pattern->name,
-        );
+        $patternDTO = PatternDTO::create($pattern);
 
         $expected = new RouteWithPatternsDTO(
             id: $routeId,

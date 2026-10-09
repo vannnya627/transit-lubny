@@ -27,12 +27,7 @@ final readonly class GetRouteAction
                 /** @var list<Pattern> $patterns */
                 $patterns = array_values($route->patterns->toArray());
 
-                $patternDTOs = array_map(fn(Pattern $pattern): PatternDTO => new PatternDTO(
-                    id: $pattern->id,
-                    direction: $pattern->direction,
-                    name: $pattern->name ?? '',
-                ), $patterns);
-
+                $patternDTOs = array_map(PatternDTO::create(...), $patterns);
 
                 return new RouteWithPatternsDTO(
                     id: $route->id,
