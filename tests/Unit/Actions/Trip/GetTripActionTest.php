@@ -14,7 +14,6 @@ use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
 use App\Data\ValueObjects\Coordinates;
 use App\Data\ValueObjects\ServiceDays;
-use App\DTOs\RouteDTO;
 use App\DTOs\StopForTripDTO;
 use App\DTOs\TripDetailsDTO;
 use App\Enum\Direction;
@@ -129,10 +128,9 @@ class GetTripActionTest extends AbstractTestCase
             stopTime: $stopTime,
             secondsFromMidnight: 57600,
         );
-        $expected = new TripDetailsDTO(
-            tripId: $trip->id,
-            route: RouteDTO::create($pattern->route),
-            headsign: $pattern->name,
+        $expected = TripDetailsDTO::create(
+            trip: $trip,
+            pattern: $pattern,
             stops: [$stopForTripDTOs],
         );
         $fixedTime = new DateTimeImmutable('2024-01-01 12:00:00', new DateTimeZone('Europe/Kyiv'));
