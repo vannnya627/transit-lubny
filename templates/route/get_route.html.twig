@@ -21,13 +21,13 @@
             Напрямки руху:
         </h2>
 
-        {% if route.parameters is empty %}
+        {% if route.patterns is empty %}
             <div class="empty-state">
                 <p><strong>[!] Напрямків для цього маршруту наразі немає.</strong></p>
             </div>
         {% else %}
             <div class="pattern-list">
-                {% for pattern in route.parameters %}
+                {% for pattern in route.patterns %}
                     <div class="pattern-card">
                         <div>
                             <span class="badge {{ pattern.direction.value == 1 ? 'badge-forward' : 'badge-return' }}">

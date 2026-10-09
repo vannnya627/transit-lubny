@@ -19,7 +19,7 @@ final readonly class RouteWithPatternsTransformer
             id: $routeDTO->id,
             shortName: $routeDTO->shortName,
             longName: $routeDTO->longName,
-            patterns: array_map($this->transformer->transformer(...), $routeDTO->parameters),
+            patterns: array_map($this->transformer->transformer(...), $routeDTO->patterns),
         );
     }
 }
