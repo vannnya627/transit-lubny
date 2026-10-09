@@ -127,12 +127,11 @@ class GetStopDeparturesActionTest extends AbstractTestCase
             ->with([$patternId])
             ->willReturn([$pattern]);
 
-        $departuresDTOs = new DepartureDTO(
-            tripId: $trip->id,
-            route: RouteDTO::create($pattern->route),
-            headsign: $pattern->name,
-            arrivalTime: $stopTime->getFormattedArrivalTime(),
-            expectedInMinutes: $stopTime->getMinutesUntil($input->getSecondsFromMidnight()),
+        $departuresDTOs = DepartureDTO::create(
+            trip: $trip,
+            pattern: $pattern,
+            route: RouteDTO::create($route),
+            secondsFromMidnight: $input->getSecondsFromMidnight(),
         );
 
         $expected = new StopWithDeparturesDTO(
