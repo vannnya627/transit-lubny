@@ -63,12 +63,7 @@ class GetStopsActionTest extends AbstractTestCase
             ->with($input)
             ->willReturn([$stop]);
 
-        $expected = new StopDTO(
-            id: $stop->id,
-            name: $stop->name,
-            coordinates: $stop->coordinates,
-            cityCode: $stop->cityCode,
-        );
+        $expected = StopDTO::create($stop);
         $result = $this->action->run($input);
         $this->assertEquals([$expected], $result);
     }

@@ -49,12 +49,7 @@ final readonly class GetTripAction
 
                     return new StopForTripDTO(
                         sequence: $stopTime->stopSequence,
-                        stop: new StopDTO(
-                            id: $stop->id,
-                            name: $stop->name,
-                            coordinates: $stop->coordinates,
-                            cityCode: $stop->cityCode,
-                        ),
+                        stop: StopDTO::create($stop),
                         arrivalTime: $stopTime->getFormattedArrivalTime(),
                         isPassed: $stopTime->isPassed($secondsFromMidnight),
                     );

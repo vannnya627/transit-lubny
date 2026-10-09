@@ -22,12 +22,7 @@ final readonly class GetStopAction
             callback: function () use ($stopId) {
                 $stop = $this->getStopByIdTask->run($stopId);
 
-                return new StopDTO(
-                    id: $stop->id,
-                    name: $stop->name,
-                    coordinates: $stop->coordinates,
-                    cityCode: $stop->cityCode,
-                );
+                return StopDTO::create($stop);
             },
         );
 
