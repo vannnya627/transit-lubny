@@ -51,12 +51,7 @@ final readonly class GetStopDeparturesAction
                     );
                 }, $trips);
 
-                return new StopWithDeparturesDTO(
-                    stopId: $stop->id,
-                    stopName: $stop->name,
-                    cityCode: $stop->cityCode,
-                    departures: $departures,
-                );
+                return StopWithDeparturesDTO::create(stop: $stop, departures: $departures);
             },
         );
     }

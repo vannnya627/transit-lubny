@@ -134,12 +134,7 @@ class GetStopDeparturesActionTest extends AbstractTestCase
             secondsFromMidnight: $input->getSecondsFromMidnight(),
         );
 
-        $expected = new StopWithDeparturesDTO(
-            stopId: $stop->id,
-            stopName: $stop->name,
-            cityCode: $stop->cityCode,
-            departures: [$departuresDTOs],
-        );
+        $expected = StopWithDeparturesDTO::create(stop: $stop, departures: [$departuresDTOs]);
         $result = $this->action->run($input);
         $this->assertEquals($expected, $result);
 
