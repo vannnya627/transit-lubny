@@ -138,7 +138,7 @@ class GetTripActionTest extends AbstractTestCase
         );
         $expected = new TripDetailsDTO(
             tripId: $trip->id,
-            route: new RouteDTO(id: $pattern->route->id, shortName: $pattern->route->shortName, longName: $pattern->route->longName),
+            route: RouteDTO::create($pattern->route),
             headsign: $pattern->name,
             stops: [$stopForTripDTOs],
         );

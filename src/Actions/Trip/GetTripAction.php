@@ -63,7 +63,7 @@ final readonly class GetTripAction
 
                 return new TripDetailsDTO(
                     tripId: $tripId,
-                    route: new RouteDTO(id: $pattern->route->id, shortName: $pattern->route->shortName, longName: $pattern->route->longName),
+                    route: RouteDTO::create($pattern->route),
                     headsign: $pattern->name,
                     stops: array_values($stopForTripDTOs),
                 );

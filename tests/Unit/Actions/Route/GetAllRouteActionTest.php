@@ -54,11 +54,7 @@ class GetAllRouteActionTest extends AbstractTestCase
             ->method('run')
             ->willReturn([$route]);
 
-        $expected = new RouteDTO(
-            id: $route->id,
-            shortName: $route->shortName,
-            longName: $route->longName,
-        );
+        $expected = RouteDTO::create($route);
 
         $result = $this->getAllRouteAction->run();
         $this->assertEquals([$expected], $result);

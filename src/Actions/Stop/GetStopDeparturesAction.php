@@ -46,7 +46,7 @@ final readonly class GetStopDeparturesAction
 
                     return new DepartureDTO(
                         tripId: $trip->id,
-                        route: new RouteDTO(id: $pattern->route->id, shortName: $pattern->route->shortName, longName: $pattern->route->longName),
+                        route: RouteDTO::create($pattern->route),
                         headsign: $pattern->name,
                         arrivalTime: $stopTime->getFormattedArrivalTime(),
                         expectedInMinutes: $stopTime->getMinutesUntil($secondsFromMidnight),
