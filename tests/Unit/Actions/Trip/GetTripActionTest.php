@@ -15,7 +15,6 @@ use App\Data\Entity\Trip\Trip;
 use App\Data\ValueObjects\Coordinates;
 use App\Data\ValueObjects\ServiceDays;
 use App\DTOs\RouteDTO;
-use App\DTOs\StopDTO;
 use App\DTOs\StopForTripDTO;
 use App\DTOs\TripDetailsDTO;
 use App\Enum\Direction;
@@ -125,11 +124,10 @@ class GetTripActionTest extends AbstractTestCase
             ->with(array_column($stopTimes, 'stopId'))
             ->willReturn([$stop]);
 
-        $stopForTripDTOs = new StopForTripDTO(
-            sequence: $stopTime->stopSequence,
-            stop: StopDTO::create($stop),
-            arrivalTime: $stopTime->getFormattedArrivalTime(),
-            isPassed: $stopTime->isPassed(57600),
+        $stopForTripDTOs = StopForTripDTO::create(
+            stop: $stop,
+            stopTime: $stopTime,
+            secondsFromMidnight: 57600,
         );
         $expected = new TripDetailsDTO(
             tripId: $trip->id,

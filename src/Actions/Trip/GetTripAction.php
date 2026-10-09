@@ -8,7 +8,6 @@ use App\Caching\TripCache;
 use App\Data\Entity\Stop;
 use App\Data\Entity\Trip\StopTime;
 use App\DTOs\RouteDTO;
-use App\DTOs\StopDTO;
 use App\DTOs\StopForTripDTO;
 use App\DTOs\TripDetailsDTO;
 use App\Tasks\Route\GetPatternWithRouteByPatternIdTask;
@@ -47,12 +46,7 @@ final readonly class GetTripAction
                     /** @var Stop $stop */
                     $stop = $sortedStopsById[$stopTime->stopId];
 
-                    return new StopForTripDTO(
-                        sequence: $stopTime->stopSequence,
-                        stop: StopDTO::create($stop),
-                        arrivalTime: $stopTime->getFormattedArrivalTime(),
-                        isPassed: $stopTime->isPassed($secondsFromMidnight),
-                    );
+                    return StopForTripDTO::create(stop: $stop, stopTime: $stopTime, secondsFromMidnight: $secondsFromMidnight);
                 }, $stopTimes);
 
 
