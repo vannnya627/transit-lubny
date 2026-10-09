@@ -29,12 +29,7 @@ final readonly class GetRouteAction
 
                 $patternDTOs = array_map(PatternDTO::create(...), $patterns);
 
-                return new RouteWithPatternsDTO(
-                    id: $route->id,
-                    shortName: $route->shortName,
-                    longName: $route->longName,
-                    parameters: $patternDTOs,
-                );
+                return RouteWithPatternsDTO::create($route, $patternDTOs);
             },
         );
     }

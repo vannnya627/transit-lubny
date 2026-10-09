@@ -68,12 +68,7 @@ class GetRouteActionTest extends AbstractTestCase
 
         $patternDTO = PatternDTO::create($pattern);
 
-        $expected = new RouteWithPatternsDTO(
-            id: $routeId,
-            shortName: $route->shortName,
-            longName: $route->longName,
-            parameters: [$patternDTO],
-        );
+        $expected = RouteWithPatternsDTO::create(route: $route, patterns: [$patternDTO]);
 
         $result = $this->getRouteAction->run($routeId);
         $this->assertEquals($expected, $result);
