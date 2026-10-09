@@ -127,10 +127,8 @@ class GetPatternWithTripsAndStopsActionTest extends AbstractTestCase
 
         $tripsDTOs =  TripDTO::create(trip: $trip, stopTimeStr: ['16:00']);
 
-        $expected =   new PatternWithStopsAndTripsDTO(
-            id: $pattern->id,
-            direction: $pattern->direction,
-            name: $pattern->name,
+        $expected =   PatternWithStopsAndTripsDTO::create(
+            pattern: $pattern,
             stops: [$stopsForScheduleDTOs],
             trips: [$tripsDTOs],
         );

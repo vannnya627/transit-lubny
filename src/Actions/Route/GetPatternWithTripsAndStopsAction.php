@@ -52,10 +52,8 @@ final readonly class GetPatternWithTripsAndStopsAction
                     static fn(TripDTO $a, TripDTO $b): int => ($a->stopTimes[0] ?? '') <=> ($b->stopTimes[0] ?? ''),
                 );
 
-                return new PatternWithStopsAndTripsDTO(
-                    id: $pattern->id,
-                    direction: $pattern->direction,
-                    name: $pattern->name,
+                return PatternWithStopsAndTripsDTO::create(
+                    pattern: $pattern,
                     stops: $stopsForScheduleDTOs,
                     trips: $tripsDTOs,
                 );
