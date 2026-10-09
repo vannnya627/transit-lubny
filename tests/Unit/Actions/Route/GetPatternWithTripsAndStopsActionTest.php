@@ -123,11 +123,7 @@ class GetPatternWithTripsAndStopsActionTest extends AbstractTestCase
             ->with($pattern->id)
             ->willReturn([$trip]);
 
-        $stopsForScheduleDTOs = new StopForScheduleDTO(
-            sequence: $patternStop->stopSequence,
-            stopId: $stop->id,
-            name: $stop->name,
-        );
+        $stopsForScheduleDTOs = StopForScheduleDTO::create(stop: $stop, patternStop: $patternStop);
 
         $tripsDTOs =  new TripDTO(
             tripId: $trip->id,

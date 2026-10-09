@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Actions\Route;
 
 use App\Caching\RouteCache;
-use App\Data\Entity\Stop;
 use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
 use App\DTOs\PatternWithStopsAndTripsDTO;
@@ -38,15 +37,7 @@ final readonly class GetPatternWithTripsAndStopsAction
                 $stops = $this->findStopsByIdsTask->run($stopIds);
                 $trips = $this->findTripsWithStopTimesByPatternIdTask->run($patternId);
 
-                $stopsForScheduleDTOs = array_map(
-                    fn(Stop $stop, $patternStop): StopForScheduleDTO => new StopForScheduleDTO(
-                        sequence: $patternStop->stopSequence,
-                        stopId: $stop->id,
-                        name: $stop->name,
-                    ),
-                    $stops,
-                    $patternStops,
-                );
+                $stopsForScheduleDTOs = array_map(StopForScheduleDTO::create(...), $stops, $patternStops);
 
                 $tripsDTOs = array_map(function (Trip $trip): TripDTO {
 
