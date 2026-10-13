@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\DTOs;
 
-use App\Data\Entity\Stop;
 use App\Data\Entity\Trip\StopTime;
 
 final readonly class StopForTripDTO
@@ -16,11 +15,11 @@ final readonly class StopForTripDTO
         public bool $isPassed,
     ) {}
 
-    public static function create(Stop $stop, StopTime $stopTime, int $secondsFromMidnight): self
+    public static function create(StopDTO $stop, StopTime $stopTime, int $secondsFromMidnight): self
     {
         return new self(
             sequence: $stopTime->stopSequence,
-            stop: StopDTO::create($stop),
+            stop: $stop,
             arrivalTime: $stopTime->getFormattedArrivalTime(),
             isPassed: $stopTime->isPassed($secondsFromMidnight),
         );

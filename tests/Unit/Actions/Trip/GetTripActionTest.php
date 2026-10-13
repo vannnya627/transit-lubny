@@ -14,6 +14,7 @@ use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
 use App\Data\ValueObjects\Coordinates;
 use App\Data\ValueObjects\ServiceDays;
+use App\DTOs\StopDTO;
 use App\DTOs\StopForTripDTO;
 use App\DTOs\TripDetailsDTO;
 use App\Enum\Direction;
@@ -124,7 +125,7 @@ class GetTripActionTest extends AbstractTestCase
             ->willReturn([$stop]);
 
         $stopForTripDTOs = StopForTripDTO::create(
-            stop: $stop,
+            stop: StopDTO::create($stop),
             stopTime: $stopTime,
             secondsFromMidnight: 57600,
         );
