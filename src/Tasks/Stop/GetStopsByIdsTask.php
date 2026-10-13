@@ -7,7 +7,7 @@ namespace App\Tasks\Stop;
 use App\Data\Entity\Stop;
 use App\Data\Repository\Interfaces\StopRepositoryInterface;
 
-readonly class FindStopsByIdsTask
+readonly class GetStopsByIdsTask
 {
     public function __construct(
         private StopRepositoryInterface $repository,
@@ -20,6 +20,6 @@ readonly class FindStopsByIdsTask
      */
     public function run(array $stopsIds): array
     {
-        return $this->repository->findStopsByIds($stopsIds);
+        return $this->repository->getStopsByIds($stopsIds);
     }
 }

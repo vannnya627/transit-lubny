@@ -20,7 +20,7 @@ use App\DTOs\StopForTripDTO;
 use App\DTOs\TripDetailsDTO;
 use App\Enum\Direction;
 use App\Tasks\Route\GetPatternWithRouteByPatternIdTask;
-use App\Tasks\Stop\FindStopsByIdsTask;
+use App\Tasks\Stop\GetStopsByIdsTask;
 use App\Tasks\Trip\GetTripByIdTask;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -34,7 +34,7 @@ class GetTripActionTest extends AbstractTestCase
 {
     private GetTripByIdTask|MockObject $getTripByIdTask;
     private GetPatternWithRouteByPatternIdTask|MockObject $getPatternWithRouteByPatternIdTask;
-    private FindStopsByIdsTask|MockObject $findStopsByIdsTask;
+    private GetStopsByIdsTask|MockObject $findStopsByIdsTask;
     private TripCache|MockObject $cache;
     private GetTripAction $action;
 
@@ -42,7 +42,7 @@ class GetTripActionTest extends AbstractTestCase
     {
         $this->getTripByIdTask = $this->createMock(GetTripByIdTask::class);
         $this->getPatternWithRouteByPatternIdTask = $this->createMock(GetPatternWithRouteByPatternIdTask::class);
-        $this->findStopsByIdsTask = $this->createMock(FindStopsByIdsTask::class);
+        $this->findStopsByIdsTask = $this->createMock(GetStopsByIdsTask::class);
         $this->cache = $this->createMock(TripCache::class);
         $this->action = new GetTripAction(
             $this->getTripByIdTask,

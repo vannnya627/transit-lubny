@@ -14,7 +14,7 @@ interface StopRepositoryInterface
      *
      * @return list<Stop>
      */
-    public function findStopsByIds(array $stopsIds): array;
+    public function getStopsByIds(array $stopsIds): array;
 
     /**
      * @return list<Stop>

@@ -12,7 +12,7 @@ use App\DTOs\StopDTO;
 use App\DTOs\StopForTripDTO;
 use App\DTOs\TripDetailsDTO;
 use App\Tasks\Route\GetPatternWithRouteByPatternIdTask;
-use App\Tasks\Stop\FindStopsByIdsTask;
+use App\Tasks\Stop\GetStopsByIdsTask;
 use App\Tasks\Trip\GetTripByIdTask;
 use DateTimeImmutable;
 use DateTimeZone;
@@ -22,7 +22,7 @@ final readonly class GetTripAction
     public function __construct(
         private GetTripByIdTask $getTripByIdTask,
         private GetPatternWithRouteByPatternIdTask $getPatternWithRouteByPatternIdTask,
-        private FindStopsByIdsTask $findStopsByIdsTask,
+        private GetStopsByIdsTask $getStopsByIdsTask,
         private TripCache $cache,
     ) {}
 
@@ -35,7 +35,7 @@ final readonly class GetTripAction
                 $pattern = $this->getPatternWithRouteByPatternIdTask->run($trip->patternId);
 
                 $stopTimes = $trip->stopTimes->toArray();
-                $stops = $this->findStopsByIdsTask->run(array_column($stopTimes, 'stopId'));
+                $stops = $this->getStopsByIdsTask->run(array_column($stopTimes, 'stopId'));
 
                 $sortedStopsById = array_column($stops, null, 'id');
 

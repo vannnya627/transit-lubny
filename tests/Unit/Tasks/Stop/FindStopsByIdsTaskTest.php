@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Tasks\Stop;
 use App\Data\Entity\Stop;
 use App\Data\Repository\Interfaces\StopRepositoryInterface;
 use App\Data\ValueObjects\Coordinates;
-use App\Tasks\Stop\FindStopsByIdsTask;
+use App\Tasks\Stop\GetStopsByIdsTask;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -17,12 +17,12 @@ use ReflectionException;
 class FindStopsByIdsTaskTest extends AbstractTestCase
 {
     private StopRepositoryInterface|MockObject $repository;
-    private FindStopsByIdsTask $task;
+    private GetStopsByIdsTask $task;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(StopRepositoryInterface::class);
-        $this->task = new FindStopsByIdsTask($this->repository);
+        $this->task = new GetStopsByIdsTask($this->repository);
     }
 
     /**
@@ -39,7 +39,7 @@ class FindStopsByIdsTaskTest extends AbstractTestCase
         $this->setEntityId($stop, $stopId);
 
         $this->repository->expects($this->once())
-            ->method('findStopsByIds')
+            ->method('getStopsByIds')
             ->with([$stopId])
             ->willReturn([$stop]);
 

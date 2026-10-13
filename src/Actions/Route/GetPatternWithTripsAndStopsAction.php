@@ -5,20 +5,22 @@ declare(strict_types=1);
 namespace App\Actions\Route;
 
 use App\Caching\RouteCache;
+use App\Data\Entity\Route\Pattern;
+use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
 use App\DTOs\PatternWithStopsAndTripsDTO;
 use App\DTOs\StopForScheduleDTO;
 use App\DTOs\TripDTO;
 use App\Tasks\Route\GetPatternByIdTask;
-use App\Tasks\Stop\FindStopsByIdsTask;
+use App\Tasks\Stop\GetStopsByIdsTask;
 use App\Tasks\Trip\FindTripsWithStopTimesByPatternIdTask;
 
 final readonly class GetPatternWithTripsAndStopsAction
 {
     public function __construct(
         private GetPatternByIdTask $getPatternByIdTask,
-        private FindStopsByIdsTask $findStopsByIdsTask,
+        private GetStopsByIdsTask $getStopsByIdsTask,
         private FindTripsWithStopTimesByPatternIdTask $findTripsWithStopTimesByPatternIdTask,
         private RouteCache $cache,
     ) {}
@@ -32,8 +34,8 @@ final readonly class GetPatternWithTripsAndStopsAction
 
                 $patternStops = $this->getPatternStops($pattern);
                 $stopIds = array_column($patternStops, 'stopId');
+                $stops = $this->getStopsByIdsTask->run($stopIds);
 
-                $stops = $this->findStopsByIdsTask->run($stopIds);
                 $trips = $this->findTripsWithStopTimesByPatternIdTask->run($patternId);
 
                 $stopsForScheduleDTOs = array_map(StopForScheduleDTO::create(...), $stops, $patternStops);

@@ -19,7 +19,7 @@ use App\DTOs\StopForScheduleDTO;
 use App\DTOs\TripDTO;
 use App\Enum\Direction;
 use App\Tasks\Route\GetPatternByIdTask;
-use App\Tasks\Stop\FindStopsByIdsTask;
+use App\Tasks\Stop\GetStopsByIdsTask;
 use App\Tasks\Trip\FindTripsWithStopTimesByPatternIdTask;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -30,7 +30,7 @@ use ReflectionException;
 class GetPatternWithTripsAndStopsActionTest extends AbstractTestCase
 {
     private GetPatternByIdTask|MockObject $getPatternByIdTask;
-    private FindStopsByIdsTask|MockObject $findStopsByIdsTask;
+    private GetStopsByIdsTask|MockObject $findStopsByIdsTask;
     private FindTripsWithStopTimesByPatternIdTask|MockObject $findTripsWithStopTimesByPatternIdTask;
     private RouteCache|MockObject $cache;
     private GetPatternWithTripsAndStopsAction $action;
@@ -38,7 +38,7 @@ class GetPatternWithTripsAndStopsActionTest extends AbstractTestCase
     protected function setUp(): void
     {
         $this->getPatternByIdTask = $this->createMock(GetPatternByIdTask::class);
-        $this->findStopsByIdsTask = $this->createMock(FindStopsByIdsTask::class);
+        $this->findStopsByIdsTask = $this->createMock(GetStopsByIdsTask::class);
         $this->findTripsWithStopTimesByPatternIdTask = $this->createMock(FindTripsWithStopTimesByPatternIdTask::class);
         $this->cache = $this->createMock(RouteCache::class);
         $this->action = new GetPatternWithTripsAndStopsAction(

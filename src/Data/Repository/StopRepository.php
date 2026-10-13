@@ -24,7 +24,7 @@ final class StopRepository extends ServiceEntityRepository implements StopReposi
         parent::__construct($registry, Stop::class);
     }
 
-    public function findStopsByIds(array $stopsIds): array
+    public function getStopsByIds(array $stopsIds): array
     {
         $stops = $this->findBy(['id' => $stopsIds]);
 
@@ -37,6 +37,8 @@ final class StopRepository extends ServiceEntityRepository implements StopReposi
         foreach ($stopsIds as $id) {
             if (isset($stopsById[$id])) {
                 $orderedStops[] = $stopsById[$id];
+            } else {
+                throw new StopNotFoundException($id);
             }
         }
 
