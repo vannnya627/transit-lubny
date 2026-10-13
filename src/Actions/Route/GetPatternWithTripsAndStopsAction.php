@@ -30,8 +30,7 @@ final readonly class GetPatternWithTripsAndStopsAction
             callback: function () use ($patternId): PatternWithStopsAndTripsDTO {
                 $pattern = $this->getPatternByIdTask->run($patternId);
 
-                $patternStops = array_values($pattern->patternStops->toArray());
-                usort($patternStops, static fn($a, $b): int => $a->stopSequence <=> $b->stopSequence);
+                $patternStops = $this->getPatternStops($pattern);
                 $stopIds = array_column($patternStops, 'stopId');
 
                 $stops = $this->findStopsByIdsTask->run($stopIds);
@@ -39,18 +38,7 @@ final readonly class GetPatternWithTripsAndStopsAction
 
                 $stopsForScheduleDTOs = array_map(StopForScheduleDTO::create(...), $stops, $patternStops);
 
-                $tripsDTOs = array_map(function (Trip $trip): TripDTO {
-
-                    $stopTimes = array_values($trip->stopTimes->toArray());
-                    $stopTimesStr = $this->getStopTimeStr($stopTimes);
-
-                    return TripDTO::create(trip: $trip, stopTimeStr: $stopTimesStr);
-                }, $trips);
-
-                usort(
-                    $tripsDTOs,
-                    static fn(TripDTO $a, TripDTO $b): int => ($a->stopTimes[0] ?? '') <=> ($b->stopTimes[0] ?? ''),
-                );
+                $tripsDTOs = $this->getTripsDTOs($trips);
 
                 return PatternWithStopsAndTripsDTO::create(
                     pattern: $pattern,
@@ -76,5 +64,40 @@ final readonly class GetPatternWithTripsAndStopsAction
         ksort($stopTimesStr);
 
         return $stopTimesStr;
+    }
+
+    /**
+     * @return list<PatternStop>
+     */
+    private function getPatternStops(Pattern $pattern): array
+    {
+        $patternStops = array_values($pattern->patternStops->toArray());
+
+        usort($patternStops, static fn(PatternStop $a, PatternStop $b): int => $a->stopSequence <=> $b->stopSequence);
+
+        return $patternStops;
+    }
+
+    /**
+     * @param list<Trip> $trips
+     *
+     * @return list<TripDTO>
+     */
+    private function getTripsDTOs(array $trips): array
+    {
+        $tripsDTOs = array_map(function (Trip $trip): TripDTO {
+
+            $stopTimes = array_values($trip->stopTimes->toArray());
+            $stopTimesStr = $this->getStopTimeStr($stopTimes);
+
+            return TripDTO::create(trip: $trip, stopTimeStr: $stopTimesStr);
+        }, $trips);
+
+        usort(
+            $tripsDTOs,
+            static fn(TripDTO $a, TripDTO $b): int => ($a->stopTimes[0] ?? '') <=> ($b->stopTimes[0] ?? ''),
+        );
+
+        return $tripsDTOs;
     }
 }
