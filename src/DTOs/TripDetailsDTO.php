@@ -22,11 +22,11 @@ final readonly class TripDetailsDTO
     /**
      * @param list<StopForTripDTO> $stops
      */
-    public static function create(Trip $trip, Pattern $pattern, array $stops): TripDetailsDTO
+    public static function create(Trip $trip, Pattern $pattern, RouteDTO $route, array $stops): TripDetailsDTO
     {
         return new self(
             tripId: $trip->id,
-            route: RouteDTO::create($pattern->route),
+            route: $route,
             headsign: $pattern->name,
             stops: $stops,
         );
