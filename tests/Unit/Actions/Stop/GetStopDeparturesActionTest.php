@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Actions\Stop;
 
 use App\Actions\Stop\GetStopDeparturesAction;
-use App\Caching\StopCache;
+use App\Caching\DepartureCache;
 use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
@@ -33,7 +33,7 @@ class GetStopDeparturesActionTest extends AbstractTestCase
     private FindTripsWithStopTimesForStopTask|MockObject $findTripsWithStopTimesForStopTask;
     private FindPatternsWithRoutesByIdsTask|MockObject $findPatternsWithRoutesByIds;
     private GetStopByIdTask|MockObject $getStopByIdTask;
-    private StopCache|MockObject $cache;
+    private DepartureCache|MockObject $cache;
 
     private GetStopDeparturesAction $action;
 
@@ -42,7 +42,7 @@ class GetStopDeparturesActionTest extends AbstractTestCase
         $this->findTripsWithStopTimesForStopTask = $this->createMock(FindTripsWithStopTimesForStopTask::class);
         $this->findPatternsWithRoutesByIds = $this->createMock(FindPatternsWithRoutesByIdsTask::class);
         $this->getStopByIdTask = $this->createMock(GetStopByIdTask::class);
-        $this->cache = $this->createMock(StopCache::class);
+        $this->cache = $this->createMock(DepartureCache::class);
         $this->action = new GetStopDeparturesAction(
             $this->findTripsWithStopTimesForStopTask,
             $this->findPatternsWithRoutesByIds,

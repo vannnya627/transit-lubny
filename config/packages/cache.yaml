@@ -25,3 +25,6 @@ framework:
             trip.cache:
                 adapter: cache.adapter.redis
                 default_lifetime: 3600
+            departure.cache:
+                adapter: cache.adapter.redis
+                default_lifetime: 60

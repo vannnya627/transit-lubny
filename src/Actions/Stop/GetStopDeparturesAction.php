@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Stop;
 
-use App\Caching\StopCache;
+use App\Caching\DepartureCache;
 use App\Data\Entity\Trip\Trip;
 use App\DTOs\DepartureDTO;
 use App\DTOs\Input\GetStopDeparturesInput;
@@ -20,7 +20,7 @@ final readonly class GetStopDeparturesAction
         private FindTripsWithStopTimesForStopTask $findTripsWithStopTimesForStopTask,
         private FindPatternsWithRoutesByIdsTask $findPatternsWithRoutesByIds,
         private GetStopByIdTask $getStopByIdTask,
-        private StopCache $cache,
+        private DepartureCache $cache,
     ) {}
 
     public function run(GetStopDeparturesInput $input): StopWithDeparturesDTO
