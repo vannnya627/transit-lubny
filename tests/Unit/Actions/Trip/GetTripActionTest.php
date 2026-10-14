@@ -14,6 +14,7 @@ use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
 use App\Data\ValueObjects\Coordinates;
 use App\Data\ValueObjects\ServiceDays;
+use App\DTOs\Input\GetTripInput;
 use App\DTOs\RouteDTO;
 use App\DTOs\StopDTO;
 use App\DTOs\StopForTripDTO;
@@ -26,8 +27,6 @@ use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionException;
-use DateTimeImmutable;
-use DateTimeZone;
 
 #[AllowMockObjectsWithoutExpectations]
 class GetTripActionTest extends AbstractTestCase
@@ -136,8 +135,8 @@ class GetTripActionTest extends AbstractTestCase
             route: RouteDTO::create($pattern->route),
             stops: [$stopForTripDTOs],
         );
-        $fixedTime = new DateTimeImmutable('2024-01-01 12:00:00', new DateTimeZone('Europe/Kyiv'));
-        $result = $this->action->run($tripId, $fixedTime);
+
+        $result = $this->action->run(new GetTripInput($tripId));
         $this->assertEquals($expected, $result);
     }
 }

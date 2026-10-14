@@ -7,6 +7,7 @@ namespace App\Actions\Trip;
 use App\Caching\TripCache;
 use App\Data\Entity\Stop;
 use App\Data\Entity\Trip\StopTime;
+use App\DTOs\Input\GetTripInput;
 use App\DTOs\RouteDTO;
 use App\DTOs\StopDTO;
 use App\DTOs\StopForTripDTO;
@@ -14,8 +15,6 @@ use App\DTOs\TripDetailsDTO;
 use App\Tasks\Route\GetPatternWithRouteByPatternIdTask;
 use App\Tasks\Stop\GetStopsByIdsTask;
 use App\Tasks\Trip\GetTripByIdTask;
-use DateTimeImmutable;
-use DateTimeZone;
 
 final readonly class GetTripAction
 {
@@ -26,12 +25,12 @@ final readonly class GetTripAction
         private TripCache $cache,
     ) {}
 
-    public function run(int $tripId, ?DateTimeImmutable $now = null): TripDetailsDTO
+    public function run(GetTripInput $input): TripDetailsDTO
     {
         return $this->cache->get(
-            key: "trip.$tripId",
-            callback: function () use ($tripId, $now) {
-                $trip = $this->getTripByIdTask->run($tripId);
+            key: "trip.$input->tripId",
+            callback: function () use ($input) {
+                $trip = $this->getTripByIdTask->run($input->tripId);
                 $pattern = $this->getPatternWithRouteByPatternIdTask->run($trip->patternId);
 
                 $stopTimes = $trip->stopTimes->toArray();
@@ -39,10 +38,7 @@ final readonly class GetTripAction
 
                 $sortedStopsById = array_column($stops, null, 'id');
 
-                $now ??= new DateTimeImmutable('now', new DateTimeZone('Europe/Kyiv'));
-                $secondsFromMidnight = $this->getSecondsFromMidnight($now);
-
-                $stopForTripDTOs = array_map(function (StopTime $stopTime) use ($secondsFromMidnight, $sortedStopsById) {
+                $stopForTripDTOs = array_map(function (StopTime $stopTime) use ($sortedStopsById, $input) {
 
                     /** @var Stop $stop */
                     $stop = $sortedStopsById[$stopTime->stopId];
@@ -50,7 +46,7 @@ final readonly class GetTripAction
                     return StopForTripDTO::create(
                         stop: StopDTO::create($stop),
                         stopTime: $stopTime,
-                        secondsFromMidnight: $secondsFromMidnight,
+                        secondsFromMidnight: $input->getSecondsFromMidnight(),
                     );
                 }, $stopTimes);
 
@@ -63,15 +59,5 @@ final readonly class GetTripAction
                 );
             },
         );
-    }
-
-    private function getSecondsFromMidnight(DateTimeImmutable $now): int
-    {
-        $secondsFromMidnight =
-            ((int) $now->format('H') * 3600) +
-            ((int) $now->format('i') * 60) +
-            ((int) $now->format('s'));
-
-        return (int) $secondsFromMidnight;
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\UI\API\Controller\Trip;
 
 use App\Actions\Trip\GetTripAction;
+use App\DTOs\Input\GetTripInput;
 use App\Exceptions\DTO\ErrorResponseDTO;
 use App\UI\API\Responses\TripDetailsResponse;
 use App\UI\API\Transformers\TripDetailsTransformer;
@@ -47,7 +48,7 @@ final class GetTripController extends AbstractController
     )]
     public function __invoke(int $id): JsonResponse
     {
-        $tripDetailsDto = $this->action->run($id);
+        $tripDetailsDto = $this->action->run(new GetTripInput($id));
 
         return $this->json($this->transformer->transform($tripDetailsDto));
     }
