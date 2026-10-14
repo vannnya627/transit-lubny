@@ -55,9 +55,4 @@ final class StopTime
 
         return (int) floor($diffInSeconds / 60);
     }
-
-    public function isPassed(int $secondsFromMidnight): bool
-    {
-        return $this->arrivalTime < $secondsFromMidnight;
-    }
 }

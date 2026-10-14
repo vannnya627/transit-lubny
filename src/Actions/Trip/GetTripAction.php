@@ -27,7 +27,7 @@ final readonly class GetTripAction
 
     public function run(GetTripInput $input): TripDetailsDTO
     {
-        return $this->cache->get(
+        $tripDetailsDTO = $this->cache->get(
             key: "trip.$input->tripId",
             callback: function () use ($input) {
                 $trip = $this->getTripByIdTask->run($input->tripId);
@@ -38,7 +38,7 @@ final readonly class GetTripAction
 
                 $sortedStopsById = array_column($stops, null, 'id');
 
-                $stopForTripDTOs = array_map(function (StopTime $stopTime) use ($sortedStopsById, $input) {
+                $stopForTripDTOs = array_map(function (StopTime $stopTime) use ($sortedStopsById) {
 
                     /** @var Stop $stop */
                     $stop = $sortedStopsById[$stopTime->stopId];
@@ -46,10 +46,8 @@ final readonly class GetTripAction
                     return StopForTripDTO::create(
                         stop: StopDTO::create($stop),
                         stopTime: $stopTime,
-                        secondsFromMidnight: $input->getSecondsFromMidnight(),
                     );
                 }, $stopTimes);
-
 
                 return TripDetailsDTO::create(
                     trip: $trip,
@@ -59,5 +57,11 @@ final readonly class GetTripAction
                 );
             },
         );
+
+        foreach ($tripDetailsDTO->stops as $stop) {
+            $stop->checkIsPassed($input->getSecondsFromMidnight());
+        }
+
+        return $tripDetailsDTO;
     }
 }
