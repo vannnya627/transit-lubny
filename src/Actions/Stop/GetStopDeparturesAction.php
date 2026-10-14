@@ -38,16 +38,15 @@ final readonly class GetStopDeparturesAction
                 $patterns = $this->findPatternsWithRoutesByIds->run($patternIds);
 
                 $patternsById = array_column($patterns, null, 'id');
-                $secondsFromMidnight = $input->getSecondsFromMidnight();
 
-                $departures = array_map(function (Trip $trip) use ($secondsFromMidnight, $patternsById): DepartureDTO {
+                $departures = array_map(function (Trip $trip) use ($input, $patternsById): DepartureDTO {
                     $pattern = $patternsById[$trip->patternId];
 
                     return DepartureDTO::create(
                         trip: $trip,
                         pattern: $pattern,
                         route: RouteDTO::create($pattern->route),
-                        secondsFromMidnight: $secondsFromMidnight,
+                        secondsFromMidnight: $input->getSecondsFromMidnight(),
                     );
                 }, $trips);
 
