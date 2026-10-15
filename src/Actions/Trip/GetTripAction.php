@@ -33,8 +33,9 @@ final readonly class GetTripAction
                 $trip = $this->getTripByIdTask->run($input->tripId);
                 $pattern = $this->getPatternWithRouteByPatternIdTask->run($trip->patternId);
 
-                $stopTimes = $trip->stopTimes->toArray();
-                $stops = $this->getStopsByIdsTask->run(array_column($stopTimes, 'stopId'));
+                $stopTimes = $trip->stopTimes->getValues();
+                $stopIds = array_column($stopTimes, 'stopId');
+                $stops = $this->getStopsByIdsTask->run($stopIds);
 
                 $sortedStopsById = array_column($stops, null, 'id');
 
@@ -53,7 +54,7 @@ final readonly class GetTripAction
                     trip: $trip,
                     pattern: $pattern,
                     route: RouteDTO::create($pattern->route),
-                    stops: array_values($stopForTripDTOs),
+                    stops: $stopForTripDTOs,
                 );
             },
         );
