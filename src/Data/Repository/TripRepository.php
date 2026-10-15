@@ -32,6 +32,7 @@ final class TripRepository extends ServiceEntityRepository implements TripReposi
             ->setParameter('patternId', $patternId)
             ->leftJoin('t.stopTimes', 'st')
             ->addSelect('st')
+            ->orderBy('st.arrivalTime', 'ASC')
             ->getQuery()
             ->getResult();
 
