@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Actions\Route;
 
 use App\Caching\RouteCache;
-use App\Data\Entity\Route\Pattern;
-use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Trip\Trip;
 use App\DTOs\PatternWithStopsAndTripsDTO;
 use App\DTOs\StopForScheduleDTO;
@@ -31,7 +29,8 @@ final readonly class GetPatternWithTripsAndStopsAction
             callback: function () use ($patternId): PatternWithStopsAndTripsDTO {
                 $pattern = $this->getPatternByIdTask->run($patternId);
 
-                $patternStops = $this->getPatternStops($pattern);
+                $patternStops = $pattern->patternStops->getValues();
+
                 $stopIds = array_column($patternStops, 'stopId');
                 $stops = $this->getStopsByIdsTask->run($stopIds);
 
@@ -51,18 +50,6 @@ final readonly class GetPatternWithTripsAndStopsAction
     }
 
     /**
-     * @return list<PatternStop>
-     */
-    private function getPatternStops(Pattern $pattern): array
-    {
-        $patternStops = array_values($pattern->patternStops->toArray());
-
-        usort($patternStops, static fn(PatternStop $a, PatternStop $b): int => $a->stopSequence <=> $b->stopSequence);
-
-        return $patternStops;
-    }
-
-    /**
      * @param list<Trip> $trips
      *
      * @return list<TripDTO>
@@ -70,11 +57,8 @@ final readonly class GetPatternWithTripsAndStopsAction
     private function getTripsDTOs(array $trips): array
     {
         return array_map(function (Trip $trip): TripDTO {
-
-            $stopTimes = array_values($trip->stopTimes->toArray());
-
             $stopTimesStr = [];
-            foreach ($stopTimes as $stopTime) {
+            foreach ($trip->stopTimes as $stopTime) {
                 $stopTimesStr[$stopTime->stopSequence - 1] = $stopTime->getFormattedArrivalTime();
             }
 
