@@ -128,7 +128,8 @@ class GetTripActionTest extends AbstractTestCase
             stop: StopDTO::create($stop),
             stopTime: $stopTime,
         );
-        $expected = TripDetailsDTO::create(
+
+        $tripDetailsDTO = TripDetailsDTO::create(
             trip: $trip,
             pattern: $pattern,
             route: RouteDTO::create($pattern->route),
@@ -137,10 +138,12 @@ class GetTripActionTest extends AbstractTestCase
 
         $input = new GetTripInput($tripId);
 
-        foreach ($expected->stops as $stop) {
-            $stop->checkIsPassed($input->getSecondsFromMidnight());
-        }
+        $stops = array_map(
+            fn(StopForTripDTO $stop) => $stop->withIsPassed($input->getSecondsFromMidnight()),
+            $tripDetailsDTO->stops,
+        );
 
+        $expected  = $tripDetailsDTO->withStops($stops);
         $result = $this->action->run($input);
         $this->assertEquals($expected, $result);
     }

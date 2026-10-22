@@ -6,13 +6,13 @@ namespace App\DTOs;
 
 use App\Data\Entity\Trip\StopTime;
 
-final class StopForTripDTO
+final readonly class StopForTripDTO
 {
     private function __construct(
-        public readonly int $sequence,
-        public readonly StopDTO $stop,
-        public readonly string $arrivalTime,
-        public readonly int $arrivalTimeInSeconds,
+        public int $sequence,
+        public StopDTO $stop,
+        public string $arrivalTime,
+        public int $arrivalTimeInSeconds,
         public bool $isPassed = false,
     ) {}
 
@@ -26,10 +26,14 @@ final class StopForTripDTO
         );
     }
 
-    public function checkIsPassed(int $secondsFromMidnight): void
+    public function withIsPassed(int $secondsFromMidnight): self
     {
-        if ($this->arrivalTimeInSeconds < $secondsFromMidnight) {
-            $this->isPassed = true;
-        }
+        return new self(
+            sequence: $this->sequence,
+            stop: $this->stop,
+            arrivalTime: $this->arrivalTime,
+            arrivalTimeInSeconds: $this->arrivalTimeInSeconds,
+            isPassed: $this->arrivalTimeInSeconds < $secondsFromMidnight,
+        );
     }
 }

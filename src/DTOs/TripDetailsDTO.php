@@ -31,4 +31,17 @@ final readonly class TripDetailsDTO
             stops: $stops,
         );
     }
+
+    /**
+     * @param list<StopForTripDTO> $stops
+     */
+    public function withStops(array $stops): self
+    {
+        return new self(
+            tripId: $this->tripId,
+            route: $this->route,
+            headsign: $this->headsign,
+            stops: $stops,
+        );
+    }
 }

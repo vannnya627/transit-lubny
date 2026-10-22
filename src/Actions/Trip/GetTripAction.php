@@ -27,6 +27,7 @@ final readonly class GetTripAction
 
     public function run(GetTripInput $input): TripDetailsDTO
     {
+        /** @var TripDetailsDTO $tripDetailsDTO */
         $tripDetailsDTO = $this->cache->get(
             key: "trip.$input->tripId",
             callback: function () use ($input) {
@@ -59,10 +60,12 @@ final readonly class GetTripAction
             },
         );
 
-        foreach ($tripDetailsDTO->stops as $stop) {
-            $stop->checkIsPassed($input->getSecondsFromMidnight());
-        }
+        $stops = array_map(
+            fn(StopForTripDTO $stop) => $stop->withIsPassed($input->getSecondsFromMidnight()),
+            $tripDetailsDTO->stops,
+        );
 
-        return $tripDetailsDTO;
+        return $tripDetailsDTO->withStops($stops);
+
     }
 }
