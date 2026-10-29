@@ -36,7 +36,12 @@ return static function (ContainerConfigurator $container): void {
             ],
         ]);
 
-    $parameters->set('app.import_dir', '%kernel.project_dir%/var/imports');
+    $importDir = '%kernel.project_dir%/var/imports';
+    if ('test' === $container->env()) {
+        $importDir = '%kernel.project_dir%/var/test_imports';
+    }
+
+    $parameters->set('app.import_dir', $importDir);
 
 
     $services = $container->services()
