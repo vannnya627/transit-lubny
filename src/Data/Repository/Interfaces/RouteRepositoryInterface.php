@@ -26,4 +26,14 @@ interface RouteRepositoryInterface
     public function findPatternsWithRoutesByIds(array $patternIds): array;
 
     public function getPatternWithRouteById(int $patternId): Pattern;
+
+    public function remove(Route $pattern): void;
+
+    public function save(Pattern $pattern): void;
+
+    public function commit(): void;
+
+    public function saveAndCommit(Route $route): void;
+
+    public function findRouteByShortName(string $shortName): ?Route;
 }

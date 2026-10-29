@@ -9,7 +9,10 @@ use App\Exceptions\Exception\TripNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $container): void {
-    $container->parameters()
+
+    $parameters = $container->parameters();
+
+    $parameters
         ->set('exceptions', [
             RouteNotFoundException::class => [
                 'type' => 'route-not-found',
@@ -32,6 +35,8 @@ return static function (ContainerConfigurator $container): void {
                 'loggable' => false,
             ],
         ]);
+
+    $parameters->set('app.import_dir', '%kernel.project_dir%/var/imports');
 
 
     $services = $container->services()

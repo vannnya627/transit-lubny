@@ -22,4 +22,15 @@ interface StopRepositoryInterface
     public function findStopsBySearchQuery(SearchStopsInput $input): array;
 
     public function getStopById(int $stopId): Stop;
+
+    public function commit(): void;
+
+    public function save(Stop $stop): void;
+
+    /**
+     * @param array<int, int> $cityCodes
+     *
+     * @return list<Stop>
+     */
+    public function findStopsByCityCodes(array $cityCodes): array;
 }

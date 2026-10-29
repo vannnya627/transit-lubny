@@ -62,4 +62,13 @@ final class TripRepository extends ServiceEntityRepository implements TripReposi
     {
         return $this->find($tripId) ?? throw new TripNotFoundException($tripId);
     }
+
+    public function findTrips(array $patternIds): array
+    {
+        if ([] === $patternIds) {
+            return [];
+        }
+
+        return $this->findBy(['patternId' => $patternIds]);
+    }
 }

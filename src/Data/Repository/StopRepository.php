@@ -75,4 +75,9 @@ final class StopRepository extends ServiceEntityRepository implements StopReposi
     {
         return $this->find($stopId) ?? throw new StopNotFoundException($stopId);
     }
+
+    public function findStopsByCityCodes(array $cityCodes): array
+    {
+        return $this->findBy(['cityCode' => $cityCodes]);
+    }
 }

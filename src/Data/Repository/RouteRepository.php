@@ -89,4 +89,9 @@ final class RouteRepository extends ServiceEntityRepository implements RouteRepo
 
         return $pattern;
     }
+
+    public function findRouteByShortName(string $shortName): ?Route
+    {
+        return $this->findOneBy(['shortName' => $shortName]);
+    }
 }
