@@ -29,7 +29,6 @@ class GetStopActionTest extends AbstractTestCase
         $this->action = new GetStopAction(
             $this->getStopByIdTask,
             $this->cache,
-            $ttlMinutes = 3600,
         );
     }
 

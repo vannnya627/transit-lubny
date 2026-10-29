@@ -27,7 +27,7 @@ final readonly class GetStopDeparturesAction
     {
 
         return $this->cache->get(
-            key: "stop.$input->stopId.with.departures",
+            key: "stop.$input->stopId.time.{$input->getSecondsFromMidnight()}",
             callback: function () use ($input) {
 
                 // todo - тут знаходжу зупинку щоб взяти тільки з неї імя, можливо змінити
