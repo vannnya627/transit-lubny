@@ -76,7 +76,15 @@ final class Trip
         return $stopTime;
     }
 
-    public function addStopTime(StopTime $stopTime): void
+    public function createStopTime(int $stopSequence, int $stopId, int $arrivalTime, bool $isEstimate): StopTime
+    {
+        $stopTime = StopTime::create($this, $stopSequence, $stopId, $arrivalTime, $isEstimate);
+        $this->addStopTime($stopTime);
+
+        return $stopTime;
+    }
+
+    private function addStopTime(StopTime $stopTime): void
     {
         if (!$this->stopTimes->contains($stopTime)) {
             $this->stopTimes->add($stopTime);

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Tasks\Route;
 
-use App\Data\Entity\Route\Pattern;
-use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
 use App\Data\Entity\Stop;
 use App\Data\Repository\Interfaces\RouteRepositoryInterface;
@@ -40,11 +38,7 @@ class FindPatternsWithRoutesByIdsTaskTest extends AbstractTestCase
         $this->setEntityId($route, $routeId);
 
         $patternId = 1;
-        $pattern = Pattern::create(
-            route: $route,
-            direction: Direction::FORWARD,
-            name: 'test',
-        );
+        $pattern = $route->createPattern(Direction::FORWARD, 'test');
         $this->setEntityId($pattern, $patternId);
 
         $stopId = 1;
@@ -55,12 +49,7 @@ class FindPatternsWithRoutesByIdsTaskTest extends AbstractTestCase
         );
         $this->setEntityId($stop, $stopId);
 
-        $patternStop = PatternStop::create(
-            pattern: $pattern,
-            stopSequence: 1,
-            stopId: $stop->id,
-        );
-        $pattern->addPatternStop($patternStop);
+        $patternStop = $pattern->createPatternStop(1, $stop->id);
 
         $this->routeRepository->expects($this->once())
             ->method('findPatternsWithRoutesByIds')

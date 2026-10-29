@@ -6,11 +6,8 @@ namespace App\Tests\Unit\Actions\Trip;
 
 use App\Actions\Trip\GetTripAction;
 use App\Caching\TripCache;
-use App\Data\Entity\Route\Pattern;
-use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
 use App\Data\Entity\Stop;
-use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
 use App\Data\ValueObjects\Coordinates;
 use App\Data\ValueObjects\ServiceDays;
@@ -63,11 +60,7 @@ class GetTripActionTest extends AbstractTestCase
         $this->setEntityId($route, $routeId);
 
         $patternId = 1;
-        $pattern = Pattern::create(
-            route: $route,
-            direction: Direction::FORWARD,
-            name: 'test',
-        );
+        $pattern = $route->createPattern(Direction::FORWARD, 'test');
         $this->setEntityId($pattern, $patternId);
 
         $stopId = 1;
@@ -78,12 +71,7 @@ class GetTripActionTest extends AbstractTestCase
         );
         $this->setEntityId($stop, $stopId);
 
-        $patternStop = PatternStop::create(
-            pattern: $pattern,
-            stopSequence: 1,
-            stopId: $stop->id,
-        );
-        $pattern->addPatternStop($patternStop);
+        $patternStop = $pattern->createPatternStop(1, $stop->id);
 
         $trip = Trip::create(
             patternId: $pattern->id,
@@ -91,14 +79,12 @@ class GetTripActionTest extends AbstractTestCase
         );
         $this->setEntityId($trip, $tripId);
 
-        $stopTime = StopTime::create(
-            trip: $trip,
+        $stopTime = $trip->createStopTime(
             stopSequence: 1,
             stopId: $stop->id,
             arrivalTime: 61200,
             isEstimate: true,
         );
-        $trip->addStopTime($stopTime);
 
         $this->cache->expects($this->once())
             ->method('get')

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\UI\WEB\Controller\Stop;
 
-use App\Data\Entity\Route\Pattern;
-use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
 use App\Data\Entity\Stop;
 use App\Data\Entity\Trip\Trip;
@@ -24,16 +22,14 @@ class GetStopDeparturesControllerTest extends AbstractWebTestCase
         $route = Route::create('5', 'Маршрут 5');
         $em->persist($route);
 
-        $pattern = Pattern::create($route, Direction::FORWARD, 'Центр - Ринок');
-        $route->addPattern($pattern);
+        $pattern = $route->createPattern(Direction::FORWARD, 'Центр - Ринок');
         $em->persist($pattern);
 
         $stop = Stop::create('Центральний Ринок', Coordinates::create(50.0, 32.0), 55);
         $em->persist($stop);
         $em->flush();
 
-        $patternStop = PatternStop::create($pattern, 1, $stop->id);
-        $pattern->addPatternStop($patternStop);
+        $patternStop = $pattern->createPatternStop(1, $stop->id);
         $em->persist($patternStop);
 
         $trip = Trip::create($pattern->id, ServiceDays::everyday());

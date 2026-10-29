@@ -74,7 +74,15 @@ final class Pattern
         return $pattern;
     }
 
-    public function addPatternStop(PatternStop $patternStop): void
+    public function createPatternStop(int $stopSequence, int $stopId): PatternStop
+    {
+        $patternStop = PatternStop::create($this, $stopSequence, $stopId);
+        $this->addPatternStop($patternStop);
+
+        return $patternStop;
+    }
+
+    private function addPatternStop(PatternStop $patternStop): void
     {
         if (!$this->patternStops->contains($patternStop)) {
             $this->patternStops->add($patternStop);

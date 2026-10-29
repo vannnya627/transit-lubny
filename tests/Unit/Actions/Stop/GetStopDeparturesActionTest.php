@@ -6,11 +6,8 @@ namespace App\Tests\Unit\Actions\Stop;
 
 use App\Actions\Stop\GetStopDeparturesAction;
 use App\Caching\DepartureCache;
-use App\Data\Entity\Route\Pattern;
-use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
 use App\Data\Entity\Stop;
-use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
 use App\Data\ValueObjects\Coordinates;
 use App\Data\ValueObjects\ServiceDays;
@@ -66,11 +63,7 @@ class GetStopDeparturesActionTest extends AbstractTestCase
         $this->setEntityId($route, $routeId);
 
         $patternId = 1;
-        $pattern = Pattern::create(
-            route: $route,
-            direction: Direction::FORWARD,
-            name: 'test',
-        );
+        $pattern = $route->createPattern(Direction::FORWARD, 'test');
         $this->setEntityId($pattern, $patternId);
 
         $stopId = 1;
@@ -81,12 +74,7 @@ class GetStopDeparturesActionTest extends AbstractTestCase
         );
         $this->setEntityId($stop, $stopId);
 
-        $patternStop = PatternStop::create(
-            pattern: $pattern,
-            stopSequence: 1,
-            stopId: $stop->id,
-        );
-        $pattern->addPatternStop($patternStop);
+        $patternStop = $pattern->createPatternStop(1, $stop->id);
 
         $tripId = 1;
         $trip = Trip::create(
@@ -95,19 +83,17 @@ class GetStopDeparturesActionTest extends AbstractTestCase
         );
         $this->setEntityId($trip, $tripId);
 
-        $stopTime = StopTime::create(
-            trip: $trip,
+        $stopTime = $trip->createStopTime(
             stopSequence: 1,
             stopId: $stop->id,
             arrivalTime: 57600,
             isEstimate: true,
         );
-        $trip->addStopTime($stopTime);
 
         $this->cache->expects($this->once())
             ->method('get')
             ->willReturnCallback(function (string $key, callable $callback) use ($input) {
-                $this->assertEquals("stop.$input->stopId.with.departures", $key);
+                $this->assertEquals("stop.$input->stopId.time.{$input->getSecondsFromMidnight()}", $key);
 
                 return $callback();
             });

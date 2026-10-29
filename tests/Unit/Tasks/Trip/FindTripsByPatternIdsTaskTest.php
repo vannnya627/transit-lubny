@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Tasks\Trip;
 
-use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\Route;
 use App\Data\Entity\Trip\Trip;
 use App\Data\Repository\Interfaces\TripRepositoryInterface;
@@ -39,11 +38,7 @@ class FindTripsByPatternIdsTaskTest extends AbstractTestCase
         $this->setEntityId($route, $routeId);
 
         $patternId = 1;
-        $pattern = Pattern::create(
-            route: $route,
-            direction: Direction::FORWARD,
-            name: 'test',
-        );
+        $pattern = $route->createPattern(Direction::FORWARD, 'test');
         $this->setEntityId($pattern, $patternId);
 
         $tripId = 1;

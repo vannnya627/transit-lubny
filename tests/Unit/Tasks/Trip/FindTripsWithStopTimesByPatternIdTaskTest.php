@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Tasks\Trip;
 
-use App\Data\Entity\Route\Pattern;
-use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
 use App\Data\Entity\Trip\Trip;
 use App\Data\Repository\Interfaces\TripRepositoryInterface;
@@ -40,19 +38,10 @@ class FindTripsWithStopTimesByPatternIdTaskTest extends AbstractTestCase
         $this->setEntityId($route, $routeId);
 
         $patternId = 1;
-        $pattern = Pattern::create(
-            route: $route,
-            direction: Direction::FORWARD,
-            name: 'test',
-        );
+        $pattern = $route->createPattern(Direction::FORWARD, 'test');
         $this->setEntityId($pattern, $patternId);
 
-        $patternStop = PatternStop::create(
-            pattern: $pattern,
-            stopSequence: 1,
-            stopId: 1,
-        );
-        $pattern->addPatternStop($patternStop);
+        $patternStop = $pattern->createPatternStop(1, 1);
 
         $tripId = 1;
         $trip = Trip::create(

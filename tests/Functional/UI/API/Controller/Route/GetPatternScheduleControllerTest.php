@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\UI\API\Controller\Route;
 
 use App\Data\Entity\Route\Pattern;
-use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
 use App\Data\Entity\Stop;
 use App\Data\Entity\Trip\Trip;
@@ -24,12 +23,7 @@ class GetPatternScheduleControllerTest extends AbstractWebTestCase
         $route = Route::create(shortName: '1', longName: 'test');
         $em->persist($route);
 
-        $pattern = Pattern::create(
-            route: $route,
-            direction: Direction::FORWARD,
-            name: 'test',
-        );
-        $route->addPattern($pattern);
+        $pattern = $route->createPattern(Direction::FORWARD, 'test');
         $em->persist($pattern);
 
         $stop = Stop::create(
@@ -40,12 +34,7 @@ class GetPatternScheduleControllerTest extends AbstractWebTestCase
         $em->persist($stop);
         $em->flush();
 
-        $patternStop = PatternStop::create(
-            pattern: $pattern,
-            stopSequence: 1,
-            stopId: $stop->id,
-        );
-        $pattern->addPatternStop($patternStop);
+        $patternStop = $pattern->createPatternStop(1, $stop->id);
         $em->persist($patternStop);
 
         $trip = Trip::create(

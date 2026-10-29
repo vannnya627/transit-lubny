@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data\Entity\Route;
 
+use App\Enum\Direction;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -70,7 +71,15 @@ final class Route
         return $route;
     }
 
-    public function addPattern(Pattern $pattern): void
+    public function createPattern(Direction $direction, string $name): Pattern
+    {
+        $pattern = Pattern::create($this, $direction, $name);
+        $this->addPattern($pattern);
+
+        return $pattern;
+    }
+
+    private function addPattern(Pattern $pattern): void
     {
         if (!$this->patterns->contains($pattern)) {
             $this->patterns->add($pattern);

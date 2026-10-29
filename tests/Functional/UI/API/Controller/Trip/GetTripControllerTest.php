@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\UI\API\Controller\Trip;
 
-use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\Route;
 use App\Data\Entity\Stop;
-use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
 use App\Data\ValueObjects\Coordinates;
 use App\Data\ValueObjects\ServiceDays;
@@ -24,12 +22,7 @@ class GetTripControllerTest extends AbstractWebTestCase
         $route = Route::create('1', 'test');
         $em->persist($route);
 
-        $pattern = Pattern::create(
-            route: $route,
-            direction: Direction::FORWARD,
-            name: 'test',
-        );
-        $route->addPattern($pattern);
+        $pattern = $route->createPattern(Direction::FORWARD, 'test');
         $em->persist($pattern);
 
         $stop = Stop::create(
@@ -47,14 +40,13 @@ class GetTripControllerTest extends AbstractWebTestCase
         $em->persist($trip);
         $em->flush();
 
-        $stopTime = StopTime::create(
-            trip: $trip,
+        $stopTime = $trip->createStopTime(
             stopSequence: 1,
             stopId: $stop->id,
             arrivalTime: 36000,
             isEstimate: false,
         );
-        $trip->addStopTime($stopTime);
+
         $em->persist($stopTime);
         $em->flush();
 

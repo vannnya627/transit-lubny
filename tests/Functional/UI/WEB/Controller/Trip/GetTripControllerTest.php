@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\UI\WEB\Controller\Trip;
 
-use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\Route;
 use App\Data\Entity\Trip\Trip;
 use App\Data\ValueObjects\ServiceDays;
@@ -21,8 +20,7 @@ class GetTripControllerTest extends AbstractWebTestCase
         $route = Route::create('3', 'Маршрут 3');
         $em->persist($route);
 
-        $pattern = Pattern::create($route, Direction::FORWARD, 'Залізничний вокзал - Центр');
-        $route->addPattern($pattern);
+        $pattern = $route->createPattern(Direction::FORWARD, 'Залізничний вокзал - Центр');
         $em->persist($pattern);
         $em->flush();
 

@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\UploadRoute;
 
 use App\Data\Entity\Route\Pattern;
-use App\Data\Entity\Route\PatternStop;
 use App\Data\Entity\Route\Route;
 use App\Data\Entity\Stop;
-use App\Data\Entity\Trip\StopTime;
 use App\Data\Entity\Trip\Trip;
 use App\Data\Repository\Interfaces\RouteRepositoryInterface;
 use App\Data\Repository\Interfaces\StopRepositoryInterface;
@@ -207,7 +205,6 @@ final readonly class UploadRouteFromJsonAction
 
         foreach ($patternsData as $patternData) {
             $pattern = $this->createPattern($route, $patternData, $stopEntities);
-            $route->addPattern($pattern);
 
             $patternsWithTrips[] = [
                 'pattern' => $pattern,
@@ -237,7 +234,7 @@ final readonly class UploadRouteFromJsonAction
 
         $patternName = $patternData['name'] ?? '';
 
-        $pattern = Pattern::create($route, $direction, $patternName);
+        $pattern = $route->createPattern($direction, $patternName);
 
         $sequence = 1;
         $stops = $patternData['stops'] ?? [];
@@ -251,8 +248,7 @@ final readonly class UploadRouteFromJsonAction
             }
 
             $stopId = $stopEntities[$code]->id;
-            $patternStop = PatternStop::create($pattern, $sequence, $stopId);
-            $pattern->addPatternStop($patternStop);
+            $pattern->createPatternStop($sequence, $stopId);
             ++$sequence;
         }
 
@@ -291,14 +287,12 @@ final readonly class UploadRouteFromJsonAction
                 $minute = is_numeric($parts[1]) ? (int) $parts[1] : 0;
                 $arrivalTime = ($hour * 3600) + ($minute * 60);
 
-                $stopTime = StopTime::create(
-                    $trip,
+                $stopTime = $trip->createStopTime(
                     $patternStop->stopSequence,
                     $patternStop->stopId,
                     $arrivalTime,
                     false,
                 );
-                $trip->addStopTime($stopTime);
             }
         }
 

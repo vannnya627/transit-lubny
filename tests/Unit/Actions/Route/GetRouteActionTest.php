@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Actions\Route;
 
 use App\Actions\Route\GetRouteAction;
 use App\Caching\RouteCache;
-use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\Route;
 use App\DTOs\PatternDTO;
 use App\DTOs\RouteWithPatternsDTO;
@@ -45,14 +44,8 @@ class GetRouteActionTest extends AbstractTestCase
         $this->setEntityId($route, $routeId);
 
         $patternId = 1;
-        $pattern = Pattern::create(
-            route: $route,
-            direction: Direction::FORWARD,
-            name: 'test',
-        );
+        $pattern = $route->createPattern(Direction::FORWARD, 'test');
         $this->setEntityId($pattern, $patternId);
-
-        $route->addPattern($pattern);
 
         $this->cache->expects($this->once())
             ->method('get')

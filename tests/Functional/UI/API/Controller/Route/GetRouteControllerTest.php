@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\UI\API\Controller\Route;
 
-use App\Data\Entity\Route\Pattern;
 use App\Data\Entity\Route\Route;
 use App\Enum\Direction;
 use App\Tests\AbstractWebTestCase;
@@ -17,12 +16,7 @@ class GetRouteControllerTest extends AbstractWebTestCase
         $em = static::getContainer()->get('doctrine')->getManager();
 
         $route = Route::create('1', 'test');
-        $pattern = Pattern::create(
-            route: $route,
-            direction: Direction::FORWARD,
-            name: 'test pattern',
-        );
-        $route->addPattern($pattern);
+        $pattern = $route->createPattern(Direction::FORWARD, 'test pattern');
 
         $em->persist($route);
         $em->persist($pattern);
