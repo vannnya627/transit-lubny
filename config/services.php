@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Exceptions\Exception\PatternNotFoundException;
-use App\Exceptions\Exception\RouteNotFoundException;
-use App\Exceptions\Exception\StopNotFoundException;
-use App\Exceptions\Exception\TripNotFoundException;
+use App\Domain\Exceptions\PatternNotFoundException;
+use App\Domain\Exceptions\RouteNotFoundException;
+use App\Domain\Exceptions\StopNotFoundException;
+use App\Domain\Exceptions\TripNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $container): void {

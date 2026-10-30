@@ -31,15 +31,15 @@ return static function (ContainerConfigurator $container): void {
             'App' => [
                 'type' => 'attribute',
                 'is_bundle' => false,
-                'dir' => '%kernel.project_dir%/src/Data/Entity',
-                'prefix' => 'App\Data\Entity',
+                'dir' => '%kernel.project_dir%/src/Domain/Entity',
+                'prefix' => 'App\Domain\Entity',
                 'alias' => 'App',
             ],
             'ValueObject' => [
                 'type' => 'attribute',
                 'is_bundle' => false,
-                'dir' => '%kernel.project_dir%/src/Data/ValueObjects',
-                'prefix' => 'App\Data\ValueObjects',
+                'dir' => '%kernel.project_dir%/src/Domain/ValueObjects',
+                'prefix' => 'App\Domain\ValueObjects',
             ],
         ],
         'dql' => [
