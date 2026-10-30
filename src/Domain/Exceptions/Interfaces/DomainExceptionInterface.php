@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Exceptions\Interfaces;
 
-interface ApiExceptionInterface
+interface DomainExceptionInterface
 {
     /**
      * @return array<string, mixed>

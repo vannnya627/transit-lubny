@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Exceptions\Handlers;
 
-use App\Domain\Exceptions\Interfaces\ApiExceptionInterface;
+use App\Domain\Exceptions\Interfaces\DomainExceptionInterface;
 use App\Presentation\Exceptions\Resolvers\ExceptionMappingDTO;
 use App\Presentation\Exceptions\Resolvers\ExceptionMappingResolver;
 use Psr\Log\LoggerInterface;
@@ -50,7 +50,7 @@ final readonly class WebExceptionListener
 
         $statusCode = $mapping->code;
         $context = [];
-        if ($exception instanceof ApiExceptionInterface) {
+        if ($exception instanceof DomainExceptionInterface) {
             $context = $exception->getContext();
         }
 
