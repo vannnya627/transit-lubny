@@ -1,4 +1,4 @@
-### Clone project:
+~### Clone project:
 ```
 git clone https://github.com/vannnya627/transit-lubny.git
 ```
@@ -20,6 +20,10 @@ docker compose exec php-fpm php bin/console doctrine:migrations:migrate --no-int
 ### Run fixtures:
 ```
 docker compose exec php-fpm php bin/console doctrine:fixtures:load --no-debug
+```
+### Run command to load routes in JSON format from the var/imports folder:
+```
+docker compose exec php-fpm bin/console app:route-json:upload
 ```
 ---
 ### Check the documentation: http://localhost/api/doc or http://localhost/api/doc.json 
