@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Repositories;
 
-use App\Application\DTOs\Inputs\SearchStopsInput;
 use App\Domain\Entity\Stop;
+use App\Domain\ValueObjects\Coordinates;
 
 interface StopRepositoryInterface
 {
@@ -19,7 +19,7 @@ interface StopRepositoryInterface
     /**
      * @return list<Stop>
      */
-    public function findStopsBySearchQuery(SearchStopsInput $input): array;
+    public function findStopsBySearchQuery(?string $query = null, ?Coordinates $coordinates = null, ?int $radius = null): array;
 
     public function getStopById(int $stopId): Stop;
 

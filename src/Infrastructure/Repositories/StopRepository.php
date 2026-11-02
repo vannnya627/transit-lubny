@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Repositories;
 
-use App\Application\DTOs\Inputs\SearchStopsInput;
 use App\Domain\Entity\Stop;
 use App\Domain\Exceptions\StopNotFoundException;
 use App\Domain\Repositories\StopRepositoryInterface;
+use App\Domain\ValueObjects\Coordinates;
 use App\Infrastructure\Repositories\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -48,21 +48,21 @@ final class StopRepository extends ServiceEntityRepository implements StopReposi
     /**
      * @return list<Stop>
      */
-    public function findStopsBySearchQuery(SearchStopsInput $input): array
+    public function findStopsBySearchQuery(?string $query = null, ?Coordinates $coordinates = null, ?int $radius = null): array
     {
         $qb = $this->createQueryBuilder('s');
 
-        if (null !== $input->q) {
+        if (null !== $query) {
             $qb->andWhere('LOWER(s.name) LIKE LOWER(:q)')
-                ->setParameter('q', '%' . $input->q . '%');
+                ->setParameter('q', '%' . $query . '%');
         }
 
-        if (null !== $input->coordinates) {
+        if (null !== $coordinates) {
 
             $qb->andWhere('ACOS(SIN(RADIANS(s.coordinates.lat)) * SIN(RADIANS(:lat)) + COS(RADIANS(s.coordinates.lat)) * COS(RADIANS(:lat)) * COS(RADIANS(s.coordinates.lon - :lon))) * 6371000 <= :radius')
-                ->setParameter('lat', $input->coordinates->lat)
-                ->setParameter('lon', $input->coordinates->lon)
-                ->setParameter('radius', $input->radius);
+                ->setParameter('lat', $coordinates->lat)
+                ->setParameter('lon', $coordinates->lon)
+                ->setParameter('radius', $radius);
         }
 
         /** @var list<Stop> $stops */

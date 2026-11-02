@@ -19,6 +19,10 @@ readonly class FindStopsBySearchQueryTask
      */
     public function run(SearchStopsInput $input): array
     {
-        return $this->repository->findStopsBySearchQuery($input);
+        return $this->repository->findStopsBySearchQuery(
+            query: $input->q,
+            coordinates: $input->coordinates,
+            radius: $input->radius,
+        );
     }
 }
