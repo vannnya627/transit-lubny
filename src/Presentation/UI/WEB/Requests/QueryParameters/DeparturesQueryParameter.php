@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\UI\WEB\Requests\QueryParameters;
 
 use App\Application\DTOs\Inputs\GetStopDeparturesInput;
+use App\Domain\ValueObjects\TimeOfDay;
 use DateTimeImmutable;
 use DateTimeInterface;
 use OpenApi\Attributes as OA;
@@ -28,7 +29,7 @@ final readonly class DeparturesQueryParameter
     {
         return new GetStopDeparturesInput(
             stopId: $stopId,
-            time: $this->time,
+            time: null !== $this->time ? TimeOfDay::fromDateTime($this->time) : TimeOfDay::now(),
             limit: $this->limit,
         );
     }
