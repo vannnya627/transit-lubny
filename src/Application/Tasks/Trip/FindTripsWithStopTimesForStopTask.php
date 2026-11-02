@@ -19,6 +19,10 @@ readonly class FindTripsWithStopTimesForStopTask
      */
     public function run(GetStopDeparturesInput $input): array
     {
-        return $this->repository->findTripsWithStopTimesForStop($input);
+        return $this->repository->findTripsWithStopTimesForStop(
+            stopId: $input->stopId,
+            time: $input->time,
+            limit: $input->limit,
+        );
     }
 }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Repositories;
 
-use App\Application\DTOs\Inputs\GetStopDeparturesInput;
 use App\Domain\Entity\Trip\Trip;
 use App\Domain\Exceptions\TripNotFoundException;
 use App\Domain\Repositories\TripRepositoryInterface;
+use App\Domain\ValueObjects\TimeOfDay;
 use App\Infrastructure\Repositories\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -39,7 +39,7 @@ final class TripRepository extends ServiceEntityRepository implements TripReposi
         return $trips;
     }
 
-    public function findTripsWithStopTimesForStop(GetStopDeparturesInput $input): array
+    public function findTripsWithStopTimesForStop(int $stopId, TimeOfDay $time, ?int $limit = null): array
     {
         $qb = $this->createQueryBuilder('t')
             ->join('t.stopTimes', 'st')
@@ -47,9 +47,9 @@ final class TripRepository extends ServiceEntityRepository implements TripReposi
             ->where('st.stopId = :stopId')
             ->andWhere('st.arrivalTime.value >= :time')
             ->orderBy('st.arrivalTime.value', 'ASC')
-            ->setMaxResults($input->limit)
-            ->setParameter('stopId', $input->stopId)
-            ->setParameter('time', $input->time->value);
+            ->setMaxResults($limit)
+            ->setParameter('stopId', $stopId)
+            ->setParameter('time', $time->value);
 
         /** @var list<Trip> $stopTimes */
         $stopTimes = $qb->getQuery()->getResult();
