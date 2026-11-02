@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\DTOs;
 
-use App\Domain\Entity\Route\PatternStop;
+use App\Domain\Entity\Pattern\PatternStop;
 use App\Domain\Entity\Stop;
 
 final readonly class StopForScheduleDTO

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Entity\Route;
 
+use App\Domain\Entity\Pattern\Pattern;
 use App\Domain\Enums\Direction;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;

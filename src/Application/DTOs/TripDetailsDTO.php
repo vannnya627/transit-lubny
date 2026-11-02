@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\DTOs;
 
-use App\Domain\Entity\Route\Pattern;
+use App\Domain\Entity\Pattern\Pattern;
 use App\Domain\Entity\Trip\Trip;
 
 final readonly class TripDetailsDTO

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Tasks\Route;
+namespace App\Application\Tasks\Pattern;
 
-use App\Domain\Entity\Route\Pattern;
-use App\Domain\Repositories\RouteRepositoryInterface;
+use App\Domain\Entity\Pattern\Pattern;
+use App\Domain\Repositories\PatternRepositoryInterface;
 
 readonly class GetPatternByIdTask
 {
     public function __construct(
-        private RouteRepositoryInterface $repository,
+        private PatternRepositoryInterface $repository,
     ) {}
 
     public function run(int $patternId): Pattern

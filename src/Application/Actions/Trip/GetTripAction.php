@@ -10,7 +10,7 @@ use App\Application\DTOs\RouteDTO;
 use App\Application\DTOs\StopDTO;
 use App\Application\DTOs\StopForTripDTO;
 use App\Application\DTOs\TripDetailsDTO;
-use App\Application\Tasks\Route\GetPatternWithRouteByPatternIdTask;
+use App\Application\Tasks\Pattern\GetPatternWithRouteByPatternIdTask;
 use App\Application\Tasks\Stop\GetStopsByIdsTask;
 use App\Application\Tasks\Trip\GetTripByIdTask;
 use App\Domain\Entity\Stop;

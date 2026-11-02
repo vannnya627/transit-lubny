@@ -9,7 +9,7 @@ use App\Application\DTOs\DepartureDTO;
 use App\Application\DTOs\Inputs\GetStopDeparturesInput;
 use App\Application\DTOs\RouteDTO;
 use App\Application\DTOs\StopWithDeparturesDTO;
-use App\Application\Tasks\Route\FindPatternsWithRoutesByIdsTask;
+use App\Application\Tasks\Pattern\FindPatternsWithRoutesByIdsTask;
 use App\Application\Tasks\Stop\GetStopByIdTask;
 use App\Application\Tasks\Trip\FindTripsWithStopTimesForStopTask;
 use App\Domain\Entity\Trip\Trip;

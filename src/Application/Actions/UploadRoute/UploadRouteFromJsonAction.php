@@ -7,7 +7,7 @@ namespace App\Application\Actions\UploadRoute;
 use App\Application\Tasks\Route\FindRouteByShortNameTask;
 use App\Application\Tasks\Stop\FindStopsByCityCodesTask;
 use App\Application\Tasks\Trip\FindTripsByPatternIdsTask;
-use App\Domain\Entity\Route\Pattern;
+use App\Domain\Entity\Pattern\Pattern;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Entity\Stop;
 use App\Domain\Entity\Trip\Trip;

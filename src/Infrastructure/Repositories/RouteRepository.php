@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Repositories;
 
-use App\Domain\Entity\Route\Pattern;
 use App\Domain\Entity\Route\Route;
-use App\Domain\Exceptions\PatternNotFoundException;
 use App\Domain\Exceptions\RouteNotFoundException;
 use App\Domain\Repositories\RouteRepositoryInterface;
 use App\Infrastructure\Repositories\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -35,59 +31,6 @@ final class RouteRepository extends ServiceEntityRepository implements RouteRepo
     public function getAllRoutes(): array
     {
         return $this->findAll();
-    }
-
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     */
-    // TODO Можливо змінити - додати репозиторій для Patter, хоча він належить Route
-    public function getPatternById(int $patternId): Pattern
-    {
-        return $this->getEntityManager()->find(Pattern::class, $patternId) ?? throw new PatternNotFoundException($patternId);
-    }
-
-    /**
-     * @param array<int, int> $patternIds
-     *
-     * @return list<Pattern>
-     */
-    public function findPatternsWithRoutesByIds(array $patternIds): array
-    {
-        $qb = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('p')
-            ->from(Pattern::class, 'p')
-            ->where('p.id IN (:patternIds)')
-            ->join('p.route', 'r')
-            ->addSelect('r')
-            ->setParameter('patternIds', $patternIds);
-
-        /** @var list<Pattern> $patterns */
-        $patterns = $qb->getQuery()->getResult();
-
-        return $patterns;
-    }
-
-    public function getPatternWithRouteById(int $patternId): Pattern
-    {
-        $qb = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('p')
-            ->from(Pattern::class, 'p')
-            ->where('p.id = :patternId')
-            ->join('p.route', 'r')
-            ->addSelect('r')
-            ->setParameter('patternId', $patternId);
-
-        /** @var Pattern|null $pattern */
-        $pattern = $qb->getQuery()->getOneOrNullResult();
-
-        if (null === $pattern) {
-            throw new PatternNotFoundException($patternId);
-        }
-
-        return $pattern;
     }
 
     public function findRouteByShortName(string $shortName): ?Route

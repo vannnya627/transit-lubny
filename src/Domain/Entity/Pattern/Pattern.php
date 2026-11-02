@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Entity\Route;
+namespace App\Domain\Entity\Pattern;
 
+use App\Domain\Entity\Route\Route;
 use App\Domain\Enums\Direction;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;

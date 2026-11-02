@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Entity\Route;
+namespace App\Domain\Entity\Pattern;
 
 use Doctrine\ORM\Mapping as ORM;
 

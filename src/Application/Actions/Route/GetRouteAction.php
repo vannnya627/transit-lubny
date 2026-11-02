@@ -8,7 +8,7 @@ use App\Application\Caching\RouteCache;
 use App\Application\DTOs\PatternDTO;
 use App\Application\DTOs\RouteWithPatternsDTO;
 use App\Application\Tasks\Route\GetRouteTask;
-use App\Domain\Entity\Route\Pattern;
+use App\Domain\Entity\Pattern\Pattern;
 
 final readonly class GetRouteAction
 {

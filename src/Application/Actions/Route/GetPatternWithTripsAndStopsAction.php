@@ -8,7 +8,7 @@ use App\Application\Caching\RouteCache;
 use App\Application\DTOs\PatternWithStopsAndTripsDTO;
 use App\Application\DTOs\StopForScheduleDTO;
 use App\Application\DTOs\TripDTO;
-use App\Application\Tasks\Route\GetPatternByIdTask;
+use App\Application\Tasks\Pattern\GetPatternByIdTask;
 use App\Application\Tasks\Stop\GetStopsByIdsTask;
 use App\Application\Tasks\Trip\FindTripsWithStopTimesByPatternIdTask;
 use App\Domain\Entity\Trip\Trip;
