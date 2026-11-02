@@ -32,7 +32,7 @@ final class TripRepository extends ServiceEntityRepository implements TripReposi
             ->setParameter('patternId', $patternId)
             ->leftJoin('t.stopTimes', 'st')
             ->addSelect('st')
-            ->orderBy('st.arrivalTime', 'ASC')
+            ->orderBy('st.arrivalTime.value', 'ASC')
             ->getQuery()
             ->getResult();
 
@@ -45,12 +45,11 @@ final class TripRepository extends ServiceEntityRepository implements TripReposi
             ->join('t.stopTimes', 'st')
             ->addSelect('st')
             ->where('st.stopId = :stopId')
-            ->andWhere('st.arrivalTime >= :time')
-            ->orderBy('st.arrivalTime', 'ASC')
+            ->andWhere('st.arrivalTime.value >= :time')
+            ->orderBy('st.arrivalTime.value', 'ASC')
             ->setMaxResults($input->limit)
-            ->setParameter('stopId', $input->stopId);
-
-        $qb->setParameter('time', $input->getSecondsFromMidnight());
+            ->setParameter('stopId', $input->stopId)
+            ->setParameter('time', $input->time->value);
 
         /** @var list<Trip> $stopTimes */
         $stopTimes = $qb->getQuery()->getResult();

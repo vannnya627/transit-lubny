@@ -61,7 +61,7 @@ final readonly class GetTripAction
         );
 
         $stops = array_map(
-            fn(StopForTripDTO $stop) => $stop->withIsPassed($input->getSecondsFromMidnight()),
+            fn(StopForTripDTO $stop) => $stop->withIsPassed($input->time),
             $tripDetailsDTO->stops,
         );
 

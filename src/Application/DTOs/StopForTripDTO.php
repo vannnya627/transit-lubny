@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\DTOs;
 
 use App\Domain\Entity\Trip\StopTime;
+use App\Domain\ValueObjects\TimeOfDay;
 
 final readonly class StopForTripDTO
 {
@@ -22,18 +23,18 @@ final readonly class StopForTripDTO
             sequence: $stopTime->stopSequence,
             stop: $stop,
             arrivalTime: $stopTime->getFormattedArrivalTime(),
-            arrivalTimeInSeconds: $stopTime->arrivalTime,
+            arrivalTimeInSeconds: $stopTime->getArrivalTimeInSeconds(),
         );
     }
 
-    public function withIsPassed(int $secondsFromMidnight): self
+    public function withIsPassed(TimeOfDay $currentTime): self
     {
         return new self(
             sequence: $this->sequence,
             stop: $this->stop,
             arrivalTime: $this->arrivalTime,
             arrivalTimeInSeconds: $this->arrivalTimeInSeconds,
-            isPassed: $this->arrivalTimeInSeconds < $secondsFromMidnight,
+            isPassed: $currentTime->isPast($this->arrivalTimeInSeconds),
         );
     }
 }

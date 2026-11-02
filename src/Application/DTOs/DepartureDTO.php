@@ -6,6 +6,7 @@ namespace App\Application\DTOs;
 
 use App\Domain\Entity\Route\Pattern;
 use App\Domain\Entity\Trip\Trip;
+use App\Domain\ValueObjects\TimeOfDay;
 
 final readonly class DepartureDTO
 {
@@ -17,14 +18,14 @@ final readonly class DepartureDTO
         public int $expectedInMinutes,
     ) {}
 
-    public static function create(Trip $trip, Pattern $pattern, RouteDTO $route, int $secondsFromMidnight): self
+    public static function create(Trip $trip, Pattern $pattern, RouteDTO $route, TimeOfDay $currentTime): self
     {
         return new self(
             tripId: $trip->id,
             route: $route,
             headsign: $pattern->name,
             arrivalTime: $trip->getFirstStopTime()->getFormattedArrivalTime(),
-            expectedInMinutes: $trip->getFirstStopTime()->getMinutesUntil($secondsFromMidnight),
+            expectedInMinutes: $trip->getFirstStopTime()->getMinutesUntil($currentTime),
         );
     }
 }

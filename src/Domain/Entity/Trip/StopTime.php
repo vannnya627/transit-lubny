@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Entity\Trip;
 
+use App\Domain\ValueObjects\TimeOfDay;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -21,15 +22,15 @@ final class StopTime
     #[ORM\Column]
     public private(set) int $stopId;
 
-    #[ORM\Column]
-    public private(set) int $arrivalTime;
+    #[ORM\Embedded(class: TimeOfDay::class, columnPrefix: false)]
+    public private(set) TimeOfDay $arrivalTime;
 
     #[ORM\Column(name: 'is_estimated')]
     public private(set) bool $isEstimate;
 
     private function __construct() {}
 
-    public static function create(Trip $trip, int $stopSequence, int $stopId, int $arrivalTime, bool $isEstimate): static
+    public static function create(Trip $trip, int $stopSequence, int $stopId, TimeOfDay $arrivalTime, bool $isEstimate): static
     {
         $stopTime = new self();
         $stopTime->trip = $trip;
@@ -41,18 +42,18 @@ final class StopTime
         return $stopTime;
     }
 
-    public function getFormattedArrivalTime(): string
+    public function getMinutesUntil(TimeOfDay $currentTime): int
     {
-        $hour = floor($this->arrivalTime / 3600);
-        $minute = floor(($this->arrivalTime % 3600) / 60);
-
-        return sprintf('%02d:%02d', $hour, $minute);
+        return $this->arrivalTime->getMinutesUntil($currentTime);
     }
 
-    public function getMinutesUntil(int $secondsFormMidnight): int
+    public function getFormattedArrivalTime(): string
     {
-        $diffInSeconds = $this->arrivalTime - $secondsFormMidnight;
+        return $this->arrivalTime->getFormattedArrivalTime();
+    }
 
-        return (int) floor($diffInSeconds / 60);
+    public function getArrivalTimeInSeconds(): int
+    {
+        return $this->arrivalTime->value;
     }
 }

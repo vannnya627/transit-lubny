@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Entity\Trip;
 
 use App\Domain\ValueObjects\ServiceDays;
+use App\Domain\ValueObjects\TimeOfDay;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -76,7 +77,7 @@ final class Trip
         return $stopTime;
     }
 
-    public function createStopTime(int $stopSequence, int $stopId, int $arrivalTime, bool $isEstimate): StopTime
+    public function createStopTime(int $stopSequence, int $stopId, TimeOfDay $arrivalTime, bool $isEstimate): StopTime
     {
         $stopTime = StopTime::create($this, $stopSequence, $stopId, $arrivalTime, $isEstimate);
         $this->addStopTime($stopTime);

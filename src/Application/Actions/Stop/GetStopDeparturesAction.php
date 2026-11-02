@@ -27,7 +27,7 @@ final readonly class GetStopDeparturesAction
     {
 
         return $this->cache->get(
-            key: "stop.$input->stopId.time.{$input->getSecondsFromMidnight()}",
+            key: "stop.$input->stopId.time.{$input->time->value}",
             callback: function () use ($input) {
 
                 // todo - тут знаходжу зупинку щоб взяти тільки з неї імя, можливо змінити
@@ -46,7 +46,7 @@ final readonly class GetStopDeparturesAction
                         trip: $trip,
                         pattern: $pattern,
                         route: RouteDTO::create($pattern->route),
-                        secondsFromMidnight: $input->getSecondsFromMidnight(),
+                        currentTime: $input->time,
                     );
                 }, $trips);
 

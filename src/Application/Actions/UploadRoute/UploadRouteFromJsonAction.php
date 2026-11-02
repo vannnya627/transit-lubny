@@ -18,6 +18,7 @@ use App\Domain\Repositories\TransactionInterface;
 use App\Domain\Repositories\TripRepositoryInterface;
 use App\Domain\ValueObjects\Coordinates;
 use App\Domain\ValueObjects\ServiceDays;
+use App\Domain\ValueObjects\TimeOfDay;
 use LogicException;
 use Throwable;
 
@@ -281,19 +282,13 @@ final readonly class UploadRouteFromJsonAction
                 continue;
             }
 
-            $parts = explode(':', $timeStr);
-            if (count($parts) >= 2) {
-                $hour = is_numeric($parts[0]) ? (int) $parts[0] : 0;
-                $minute = is_numeric($parts[1]) ? (int) $parts[1] : 0;
-                $arrivalTime = ($hour * 3600) + ($minute * 60);
+            $stopTime = $trip->createStopTime(
+                $patternStop->stopSequence,
+                $patternStop->stopId,
+                TimeOfDay::fromString($timeStr),
+                false,
+            );
 
-                $stopTime = $trip->createStopTime(
-                    $patternStop->stopSequence,
-                    $patternStop->stopId,
-                    $arrivalTime,
-                    false,
-                );
-            }
         }
 
         return $trip;
