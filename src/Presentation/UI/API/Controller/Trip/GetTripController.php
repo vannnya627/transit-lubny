@@ -6,6 +6,7 @@ namespace App\Presentation\UI\API\Controller\Trip;
 
 use App\Application\Actions\Trip\GetTripAction;
 use App\Application\DTOs\Inputs\GetTripInput;
+use App\Domain\ValueObjects\TimeOfDay;
 use App\Presentation\Exceptions\DTOs\ErrorResponseDTO;
 use App\Presentation\UI\API\Responses\TripDetailsResponse;
 use App\Presentation\UI\API\Transformers\TripDetailsTransformer;
@@ -48,7 +49,7 @@ final class GetTripController extends AbstractController
     )]
     public function __invoke(int $id): JsonResponse
     {
-        $tripDetailsDto = $this->action->run(new GetTripInput($id));
+        $tripDetailsDto = $this->action->run(new GetTripInput($id, TimeOfDay::now()));
 
         return $this->json($this->transformer->transform($tripDetailsDto));
     }
