@@ -14,16 +14,14 @@ use InvalidArgumentException;
 final class TimeOfDay
 {
     private const int SECONDS_IN_DAY = 86400;
-    #[ORM\Column(name: 'arrival_time')]
-    public private(set) int $value {
-        set(int $value) => ($value < 0 || $value >= self::SECONDS_IN_DAY)
-            ? throw new InvalidArgumentException('Час доби має бути в межах від 0 до 86399 секунд') : $value;
-    }
 
-    private function __construct(int $seconds)
-    {
-        $this->value = $seconds;
-    }
+    private function __construct(
+        #[ORM\Column(name: 'arrival_time')]
+        public private(set) int $value {
+            set(int $value) => ($value < 0 || $value >= self::SECONDS_IN_DAY)
+                ? throw new InvalidArgumentException('Час доби має бути в межах від 0 до 86399 секунд') : $value;
+        },
+    ) {}
 
     public static function now(?DateTimeZone $timeZone = null): self
     {
