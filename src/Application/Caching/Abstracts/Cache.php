@@ -24,7 +24,7 @@ abstract readonly class Cache
     {
         try {
             return $this->cache->get($key, fn() => $callback());
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             return $callback();
         }
     }
