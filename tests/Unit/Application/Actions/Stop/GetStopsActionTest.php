@@ -52,8 +52,8 @@ class GetStopsActionTest extends AbstractTestCase
 
         $this->cache->expects($this->once())
             ->method('get')
-            ->willReturnCallback(function (string $key, callable $callback) {
-                $this->assertEquals('stops', $key);
+            ->willReturnCallback(function (string $key, callable $callback) use ($input) {
+                $this->assertEquals("stops.$input->q", $key);
 
                 return $callback();
             });

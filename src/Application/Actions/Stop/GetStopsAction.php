@@ -23,7 +23,7 @@ final readonly class GetStopsAction
     {
 
         return $this->cache->get(
-            key: 'stops',
+            key: "stops.$input->q",
             callback: function () use ($input) {
                 $stops = $this->findStopsBySearchQueryTask->run($input);
 
