@@ -7,7 +7,6 @@ namespace App\Infrastructure\Repositories;
 use App\Domain\Entity\Trip\Trip;
 use App\Domain\Exceptions\TripNotFoundException;
 use App\Domain\Repositories\TripRepositoryInterface;
-use App\Domain\ValueObjects\TimeOfDay;
 use App\Infrastructure\Repositories\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,24 +36,6 @@ final class TripRepository extends ServiceEntityRepository implements TripReposi
             ->getResult();
 
         return $trips;
-    }
-
-    public function findTripsWithStopTimesForStop(int $stopId, TimeOfDay $time, ?int $limit = null): array
-    {
-        $qb = $this->createQueryBuilder('t')
-            ->join('t.stopTimes', 'st')
-            ->addSelect('st')
-            ->where('st.stopId = :stopId')
-            ->andWhere('st.arrivalTime.value >= :time')
-            ->orderBy('st.arrivalTime.value', 'ASC')
-            ->setMaxResults($limit)
-            ->setParameter('stopId', $stopId)
-            ->setParameter('time', $time->value);
-
-        /** @var list<Trip> $stopTimes */
-        $stopTimes = $qb->getQuery()->getResult();
-
-        return $stopTimes;
     }
 
     public function getTripById(int $tripId): Trip
