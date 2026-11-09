@@ -60,7 +60,7 @@ final class TimeOfDay
 
     public function getMinutesUntil(self $other): int
     {
-        return (int) floor($this->value - $other->value / 60);
+        return (int) floor(($this->value - $other->value) / 60);
     }
 
     public function getFormattedArrivalTime(): string
