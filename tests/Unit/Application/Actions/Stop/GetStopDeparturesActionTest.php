@@ -12,7 +12,7 @@ use App\Application\DTOs\RouteDTO;
 use App\Application\DTOs\StopWithDeparturesDTO;
 use App\Application\Tasks\Pattern\FindPatternsWithRoutesByIdsTask;
 use App\Application\Tasks\Stop\GetStopByIdTask;
-use App\Application\Tasks\Trip\FindTripsWithStopTimesForStopTask;
+use App\Application\Tasks\StopTime\FindStopTimesWithTripTask;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Entity\Stop;
 use App\Domain\Entity\Trip\Trip;
@@ -28,24 +28,24 @@ use ReflectionException;
 #[AllowMockObjectsWithoutExpectations]
 class GetStopDeparturesActionTest extends AbstractTestCase
 {
-    private FindTripsWithStopTimesForStopTask|MockObject $findTripsWithStopTimesForStopTask;
     private FindPatternsWithRoutesByIdsTask|MockObject $findPatternsWithRoutesByIds;
     private GetStopByIdTask|MockObject $getStopByIdTask;
     private DepartureCache|MockObject $cache;
+    private FindStopTimesWithTripTask|MockObject $findStopTimesWithTripTask;
 
     private GetStopDeparturesAction $action;
 
     protected function setUp(): void
     {
-        $this->findTripsWithStopTimesForStopTask = $this->createMock(FindTripsWithStopTimesForStopTask::class);
         $this->findPatternsWithRoutesByIds = $this->createMock(FindPatternsWithRoutesByIdsTask::class);
         $this->getStopByIdTask = $this->createMock(GetStopByIdTask::class);
         $this->cache = $this->createMock(DepartureCache::class);
+        $this->findStopTimesWithTripTask = $this->createMock(FindStopTimesWithTripTask::class);
         $this->action = new GetStopDeparturesAction(
-            $this->findTripsWithStopTimesForStopTask,
             $this->findPatternsWithRoutesByIds,
             $this->getStopByIdTask,
             $this->cache,
+            $this->findStopTimesWithTripTask,
         );
     }
 
@@ -105,10 +105,10 @@ class GetStopDeparturesActionTest extends AbstractTestCase
             ->with($stopId)
             ->willReturn($stop);
 
-        $this->findTripsWithStopTimesForStopTask->expects($this->once())
+        $this->findStopTimesWithTripTask->expects($this->once())
             ->method('run')
             ->with($input)
-            ->willReturn([$trip]);
+            ->willReturn([$stopTime]);
 
         $this->findPatternsWithRoutesByIds->expects($this->once())
             ->method('run')
@@ -116,10 +116,10 @@ class GetStopDeparturesActionTest extends AbstractTestCase
             ->willReturn([$pattern]);
 
         $departuresDTOs = DepartureDTO::create(
-            trip: $trip,
             pattern: $pattern,
             route: RouteDTO::create($route),
             currentTime: $input->time,
+            stopTime: $stopTime,
         );
 
         $expected = StopWithDeparturesDTO::create(stop: $stop, departures: [$departuresDTOs]);

@@ -11,16 +11,16 @@ use App\Application\DTOs\RouteDTO;
 use App\Application\DTOs\StopWithDeparturesDTO;
 use App\Application\Tasks\Pattern\FindPatternsWithRoutesByIdsTask;
 use App\Application\Tasks\Stop\GetStopByIdTask;
-use App\Application\Tasks\Trip\FindTripsWithStopTimesForStopTask;
-use App\Domain\Entity\Trip\Trip;
+use App\Application\Tasks\StopTime\FindStopTimesWithTripTask;
+use App\Domain\Entity\Trip\StopTime;
 
 final readonly class GetStopDeparturesAction
 {
     public function __construct(
-        private FindTripsWithStopTimesForStopTask $findTripsWithStopTimesForStopTask,
         private FindPatternsWithRoutesByIdsTask $findPatternsWithRoutesByIds,
         private GetStopByIdTask $getStopByIdTask,
         private DepartureCache $cache,
+        private FindStopTimesWithTripTask $findStopTimesWithTripTask,
     ) {}
 
     public function run(GetStopDeparturesInput $input): StopWithDeparturesDTO
@@ -32,23 +32,24 @@ final readonly class GetStopDeparturesAction
 
                 // todo - тут знаходжу зупинку щоб взяти тільки з неї імя, можливо змінити
                 $stop = $this->getStopByIdTask->run($input->stopId);
-                $trips = $this->findTripsWithStopTimesForStopTask->run($input);
 
-                $patternIds = $this->extractPatternIds($trips);
+                $stopTimes = $this->findStopTimesWithTripTask->run($input);
+
+                $patternIds = $this->extractPatternIds($stopTimes);
                 $patterns = $this->findPatternsWithRoutesByIds->run($patternIds);
 
                 $patternsById = array_column($patterns, null, 'id');
 
-                $departures = array_map(function (Trip $trip) use ($input, $patternsById): DepartureDTO {
-                    $pattern = $patternsById[$trip->patternId];
+                $departures = array_map(function (StopTime $stopTime) use ($input, $patternsById): DepartureDTO {
+                    $pattern = $patternsById[$stopTime->trip->patternId];
 
                     return DepartureDTO::create(
-                        trip: $trip,
                         pattern: $pattern,
                         route: RouteDTO::create($pattern->route),
                         currentTime: $input->time,
+                        stopTime: $stopTime,
                     );
-                }, $trips);
+                }, $stopTimes);
 
                 return StopWithDeparturesDTO::create(stop: $stop, departures: $departures);
             },
@@ -56,13 +57,13 @@ final readonly class GetStopDeparturesAction
     }
 
     /**
-     * @param list<Trip> $trips
+     * @param list<StopTime> $stopTimes
      *
      * @return array<int, int>
      */
-    private function extractPatternIds(array $trips): array
+    private function extractPatternIds(array $stopTimes): array
     {
-        return array_map(fn(Trip $trip) => $trip->patternId, $trips)
+        return array_map(fn(StopTime $stopTime) => $stopTime->trip->patternId, $stopTimes)
                 |> array_unique(...)
                 |> array_values(...);
     }
