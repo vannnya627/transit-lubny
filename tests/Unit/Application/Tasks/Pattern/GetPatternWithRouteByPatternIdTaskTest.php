@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Application\Tasks\Pattern;
 use App\Application\Tasks\Pattern\GetPatternWithRouteByPatternIdTask;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Enums\Direction;
-use App\Domain\Repositories\PatternRepositoryInterface;
+use App\Domain\Repositories\PatternReadRepositoryInterface;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -16,12 +16,12 @@ use ReflectionException;
 #[AllowMockObjectsWithoutExpectations]
 class GetPatternWithRouteByPatternIdTaskTest extends AbstractTestCase
 {
-    private PatternRepositoryInterface|MockObject $repository;
+    private PatternReadRepositoryInterface|MockObject $repository;
     private GetPatternWithRouteByPatternIdTask $task;
 
     protected function setUp(): void
     {
-        $this->repository = $this->createMock(PatternRepositoryInterface::class);
+        $this->repository = $this->createMock(PatternReadRepositoryInterface::class);
         $this->task = new GetPatternWithRouteByPatternIdTask($this->repository);
     }
 

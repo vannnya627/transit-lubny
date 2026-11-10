@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Application\Tasks\Pattern;
 
 use App\Domain\Entity\Pattern\Pattern;
-use App\Domain\Repositories\PatternRepositoryInterface;
+use App\Domain\Repositories\PatternReadRepositoryInterface;
 
 readonly class GetPatternWithRouteByPatternIdTask
 {
     public function __construct(
-        public PatternRepositoryInterface $patternRepository,
+        public PatternReadRepositoryInterface $patternRepository,
     ) {}
 
     public function run(int $patternId): Pattern

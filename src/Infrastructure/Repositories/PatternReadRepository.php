@@ -6,14 +6,14 @@ namespace App\Infrastructure\Repositories;
 
 use App\Domain\Entity\Pattern\Pattern;
 use App\Domain\Exceptions\PatternNotFoundException;
-use App\Domain\Repositories\PatternRepositoryInterface;
+use App\Domain\Repositories\PatternReadRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Pattern>
  */
-final class PatternRepository extends ServiceEntityRepository implements PatternRepositoryInterface
+final class PatternReadRepository extends ServiceEntityRepository implements PatternReadRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {

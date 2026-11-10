@@ -8,7 +8,7 @@ use App\Application\Tasks\Pattern\FindPatternsWithRoutesByIdsTask;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Entity\Stop;
 use App\Domain\Enums\Direction;
-use App\Domain\Repositories\PatternRepositoryInterface;
+use App\Domain\Repositories\PatternReadRepositoryInterface;
 use App\Domain\ValueObjects\Coordinates;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -18,12 +18,12 @@ use ReflectionException;
 #[AllowMockObjectsWithoutExpectations]
 class FindPatternsWithRoutesByIdsTaskTest extends AbstractTestCase
 {
-    private PatternRepositoryInterface|MockObject $patternRepository;
+    private PatternReadRepositoryInterface|MockObject $patternRepository;
     private FindPatternsWithRoutesByIdsTask $task;
 
     protected function setUp(): void
     {
-        $this->patternRepository = $this->createMock(PatternRepositoryInterface::class);
+        $this->patternRepository = $this->createMock(PatternReadRepositoryInterface::class);
         $this->task = new FindPatternsWithRoutesByIdsTask($this->patternRepository);
     }
 

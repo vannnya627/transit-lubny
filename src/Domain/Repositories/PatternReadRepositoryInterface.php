@@ -6,7 +6,7 @@ namespace App\Domain\Repositories;
 
 use App\Domain\Entity\Pattern\Pattern;
 
-interface PatternRepositoryInterface
+interface PatternReadRepositoryInterface
 {
     public function getPatternById(int $patternId): Pattern;
 
