@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Repositories;
+namespace App\Infrastructure\Repositories\Route;
 
 use App\Domain\Entity\Route\Route;
 use App\Domain\Exceptions\RouteNotFoundException;
-use App\Domain\Repositories\RouteRepositoryInterface;
+use App\Domain\Repositories\Route\RouteRepositoryInterface;
 use App\Infrastructure\Repositories\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

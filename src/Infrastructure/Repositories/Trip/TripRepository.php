@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Repositories;
+namespace App\Infrastructure\Repositories\Trip;
 
 use App\Domain\Entity\Trip\Trip;
 use App\Domain\Exceptions\TripNotFoundException;
-use App\Domain\Repositories\TripRepositoryInterface;
+use App\Domain\Repositories\Trip\TripRepositoryInterface;
 use App\Infrastructure\Repositories\Traits\RepositorySupportTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

@@ -9,7 +9,7 @@ use App\Application\Tasks\StopTime\FindStopTimesWithTripTask;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Entity\Trip\Trip;
 use App\Domain\Enums\Direction;
-use App\Domain\Repositories\StopTimeReadRepositoryInterface;
+use App\Domain\Repositories\Trip\StopTimeReadRepositoryInterface;
 use App\Domain\ValueObjects\ServiceDays;
 use App\Domain\ValueObjects\TimeOfDay;
 use App\Tests\AbstractTestCase;

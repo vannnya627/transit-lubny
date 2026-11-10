@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Repositories;
+namespace App\Infrastructure\Repositories\Route\Pattern;
 
 use App\Domain\Entity\Route\Pattern\Pattern;
 use App\Domain\Exceptions\PatternNotFoundException;
-use App\Domain\Repositories\PatternReadRepositoryInterface;
+use App\Domain\Repositories\Route\Pattern\PatternReadRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

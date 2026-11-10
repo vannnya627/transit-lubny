@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Tasks\Trip;
 
 use App\Domain\Entity\Trip\Trip;
-use App\Domain\Repositories\TripRepositoryInterface;
+use App\Domain\Repositories\Trip\TripRepositoryInterface;
 
 readonly class FindTripsWithStopTimesByPatternIdTask
 {

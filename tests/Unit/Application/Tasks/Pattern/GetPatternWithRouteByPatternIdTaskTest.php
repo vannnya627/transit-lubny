@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Application\Tasks\Pattern;
 use App\Application\Tasks\Pattern\GetPatternWithRouteByPatternIdTask;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Enums\Direction;
-use App\Domain\Repositories\PatternReadRepositoryInterface;
+use App\Domain\Repositories\Route\Pattern\PatternReadRepositoryInterface;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;

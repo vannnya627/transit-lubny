@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Repositories;
+namespace App\Infrastructure\Repositories\Trip;
 
 use App\Domain\Entity\Trip\StopTime;
-use App\Domain\Repositories\StopTimeReadRepositoryInterface;
+use App\Domain\Repositories\Trip\StopTimeReadRepositoryInterface;
 use App\Domain\ValueObjects\TimeOfDay;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

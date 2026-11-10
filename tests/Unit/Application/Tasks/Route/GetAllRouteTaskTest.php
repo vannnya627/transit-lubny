@@ -6,7 +6,7 @@ namespace App\Tests\Unit\Application\Tasks\Route;
 
 use App\Application\Tasks\Route\GetAllRouteTask;
 use App\Domain\Entity\Route\Route;
-use App\Domain\Repositories\RouteRepositoryInterface;
+use App\Domain\Repositories\Route\RouteRepositoryInterface;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;

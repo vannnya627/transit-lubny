@@ -8,7 +8,7 @@ use App\Application\Tasks\Pattern\FindPatternsWithRoutesByIdsTask;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Entity\Stop;
 use App\Domain\Enums\Direction;
-use App\Domain\Repositories\PatternReadRepositoryInterface;
+use App\Domain\Repositories\Route\Pattern\PatternReadRepositoryInterface;
 use App\Domain\ValueObjects\Coordinates;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

@@ -6,7 +6,7 @@ namespace App\Tests\Unit\Application\Tasks\Trip;
 
 use App\Application\Tasks\Trip\GetTripByIdTask;
 use App\Domain\Entity\Trip\Trip;
-use App\Domain\Repositories\TripRepositoryInterface;
+use App\Domain\Repositories\Trip\TripRepositoryInterface;
 use App\Domain\ValueObjects\ServiceDays;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

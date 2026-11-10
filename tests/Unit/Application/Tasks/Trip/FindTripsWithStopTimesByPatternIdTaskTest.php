@@ -8,7 +8,7 @@ use App\Application\Tasks\Trip\FindTripsWithStopTimesByPatternIdTask;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Entity\Trip\Trip;
 use App\Domain\Enums\Direction;
-use App\Domain\Repositories\TripRepositoryInterface;
+use App\Domain\Repositories\Trip\TripRepositoryInterface;
 use App\Domain\ValueObjects\ServiceDays;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

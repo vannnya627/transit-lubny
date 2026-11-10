@@ -6,7 +6,7 @@ namespace App\Application\Tasks\StopTime;
 
 use App\Application\DTOs\Inputs\GetStopDeparturesInput;
 use App\Domain\Entity\Trip\StopTime;
-use App\Domain\Repositories\StopTimeReadRepositoryInterface;
+use App\Domain\Repositories\Trip\StopTimeReadRepositoryInterface;
 
 readonly class FindStopTimesWithTripTask
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Repositories;
+namespace App\Domain\Repositories\Route;
 
 use App\Domain\Entity\Route\Route;
 
