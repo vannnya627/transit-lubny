@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Repositories;
 
-use App\Domain\Entity\Pattern\Pattern;
+use App\Domain\Entity\Route\Pattern\Pattern;
 use App\Domain\Exceptions\PatternNotFoundException;
 use App\Domain\Repositories\PatternReadRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

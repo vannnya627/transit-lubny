@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Presentation\UI\API\Controller\Route;
 
-use App\Domain\Entity\Pattern\Pattern;
+use App\Domain\Entity\Route\Pattern\Pattern;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Entity\Stop;
 use App\Domain\Entity\Trip\Trip;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Tasks\Pattern;
 
-use App\Domain\Entity\Pattern\Pattern;
+use App\Domain\Entity\Route\Pattern\Pattern;
 use App\Domain\Repositories\PatternReadRepositoryInterface;
 
 readonly class GetPatternByIdTask
