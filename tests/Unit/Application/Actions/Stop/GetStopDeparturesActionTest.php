@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Application\Actions\Stop;
 
 use App\Application\Actions\Stop\GetStopDeparturesAction;
 use App\Application\Caching\DepartureCache;
+use App\Application\Caching\Keys\GetStopDeparturesCacheKey;
 use App\Application\DTOs\DepartureDTO;
 use App\Application\DTOs\Inputs\GetStopDeparturesInput;
 use App\Application\DTOs\RouteDTO;
@@ -95,7 +96,7 @@ class GetStopDeparturesActionTest extends AbstractTestCase
         $this->cache->expects($this->once())
             ->method('get')
             ->willReturnCallback(function (string $key, callable $callback) use ($input) {
-                $this->assertEquals("stop.$input->stopId.time.{$input->time->value}", $key);
+                $this->assertEquals(GetStopDeparturesCacheKey::fromInput($input)->toString(), $key);
 
                 return $callback();
             });

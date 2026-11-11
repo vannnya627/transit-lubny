@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Actions\Stop;
 
 use App\Application\Actions\Stop\GetStopsAction;
+use App\Application\Caching\Keys\SearchStopsCacheKey;
 use App\Application\Caching\StopCache;
 use App\Application\DTOs\Inputs\SearchStopsInput;
 use App\Application\DTOs\StopDTO;
@@ -53,7 +54,7 @@ class GetStopsActionTest extends AbstractTestCase
         $this->cache->expects($this->once())
             ->method('get')
             ->willReturnCallback(function (string $key, callable $callback) use ($input) {
-                $this->assertEquals("stops.$input->q", $key);
+                $this->assertEquals(SearchStopsCacheKey::fromInput($input)->toString(), $key);
 
                 return $callback();
             });

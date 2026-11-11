@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Actions\Stop;
 
 use App\Application\Caching\DepartureCache;
+use App\Application\Caching\Keys\GetStopDeparturesCacheKey;
 use App\Application\DTOs\DepartureDTO;
 use App\Application\DTOs\Inputs\GetStopDeparturesInput;
 use App\Application\DTOs\RouteDTO;
@@ -27,7 +28,7 @@ final readonly class GetStopDeparturesAction
     {
 
         return $this->cache->get(
-            key: "stop.$input->stopId.time.{$input->time->value}",
+            key: GetStopDeparturesCacheKey::fromInput($input)->toString(),
             callback: function () use ($input) {
 
                 // todo - тут знаходжу зупинку щоб взяти тільки з неї імя, можливо змінити
