@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\UploadRoute;
 
+use App\Application\Tasks\Route\DeleteRouteTask;
 use App\Application\Tasks\Route\FindRouteByShortNameTask;
 use App\Application\Tasks\Stop\FindStopsByCityCodesTask;
-use App\Application\Tasks\Trip\FindTripsByPatternIdsTask;
 use App\Domain\Entity\Route\Pattern\Pattern;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Entity\Stop;
@@ -33,10 +33,10 @@ final readonly class UploadRouteFromJsonAction
         private StopRepositoryInterface $stopRepository,
         private RouteRepositoryInterface $routeRepository,
         private TripRepositoryInterface $tripRepository,
-        private FindTripsByPatternIdsTask $findTripsByPatternIdsTask,
         private FindRouteByShortNameTask $findRouteByShortNameTask,
         private FindStopsByCityCodesTask $findStopsByCityCodesTask,
         private TransactionInterface $transaction,
+        private DeleteRouteTask $deleteRouteTask,
     ) {}
 
     /**
@@ -136,18 +136,9 @@ final readonly class UploadRouteFromJsonAction
             $route = $this->findRouteByShortNameTask->run($routeData['shortName']);
 
             if (null !== $route) {
-
-                $patternsId = array_column($route->patterns->getValues(), 'id');
-                $trips = $this->findTripsByPatternIdsTask->run($patternsId);
-
-                foreach ($trips as $trip) {
-                    $this->tripRepository->remove($trip);
-                }
-
-                $this->routeRepository->remove($route);
+                $this->deleteRouteTask->run($route);
             }
         }
-        $this->routeRepository->commit();
     }
 
     /**

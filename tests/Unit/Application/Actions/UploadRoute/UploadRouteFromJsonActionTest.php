@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Actions\UploadRoute;
 
 use App\Application\Actions\UploadRoute\UploadRouteFromJsonAction;
+use App\Application\Tasks\Route\DeleteRouteTask;
 use App\Application\Tasks\Route\FindRouteByShortNameTask;
 use App\Application\Tasks\Stop\FindStopsByCityCodesTask;
-use App\Application\Tasks\Trip\FindTripsByPatternIdsTask;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Entity\Stop;
 use App\Domain\Entity\Trip\Trip;
@@ -30,10 +30,10 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
     private StopRepositoryInterface|MockObject $stopRepository;
     private RouteRepositoryInterface|MockObject $routeRepository;
     private TripRepositoryInterface|MockObject $tripRepository;
-    private FindTripsByPatternIdsTask|MockObject $findTripsByPatternIdsTask;
     private FindRouteByShortNameTask|MockObject $findRouteByShortNameTask;
     private FindStopsByCityCodesTask|MockObject $findStopsByCityCodesTask;
     private TransactionInterface|MockObject $transaction;
+    private DeleteRouteTask|MockObject $deleteRouteTask;
 
     private UploadRouteFromJsonAction $action;
 
@@ -44,19 +44,20 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
         $this->stopRepository = $this->createMock(StopRepositoryInterface::class);
         $this->routeRepository = $this->createMock(RouteRepositoryInterface::class);
         $this->tripRepository = $this->createMock(TripRepositoryInterface::class);
-        $this->findTripsByPatternIdsTask = $this->createMock(FindTripsByPatternIdsTask::class);
         $this->findRouteByShortNameTask = $this->createMock(FindRouteByShortNameTask::class);
         $this->findStopsByCityCodesTask = $this->createMock(FindStopsByCityCodesTask::class);
         $this->transaction = $this->createMock(TransactionInterface::class);
+        $this->deleteRouteTask = $this->createMock(DeleteRouteTask::class);
+
 
         $this->action = new UploadRouteFromJsonAction(
             $this->stopRepository,
             $this->routeRepository,
             $this->tripRepository,
-            $this->findTripsByPatternIdsTask,
             $this->findRouteByShortNameTask,
             $this->findStopsByCityCodesTask,
             $this->transaction,
+            $this->deleteRouteTask,
         );
     }
 
@@ -82,9 +83,6 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
             ->method('run')
             ->with('99')
             ->willReturn(null);
-
-        $this->routeRepository->expects($this->once())
-            ->method('commit');
 
         $this->findStopsByCityCodesTask->expects($this->once())
             ->method('run')
@@ -135,9 +133,6 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
             ->method('run')
             ->with('99')
             ->willReturn(null);
-
-        $this->routeRepository->expects($this->once())
-            ->method('commit');
 
         $this->findStopsByCityCodesTask->expects($this->once())
             ->method('run')
@@ -207,21 +202,9 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
             ->with('99')
             ->willReturn($existingRoute);
 
-        $this->findTripsByPatternIdsTask->expects($this->once())
+        $this->deleteRouteTask->expects($this->once())
             ->method('run')
-            ->with([$existingPatternId])
-            ->willReturn([$existingTrip]);
-
-        $this->tripRepository->expects($this->once())
-            ->method('remove')
-            ->with($existingTrip);
-
-        $this->routeRepository->expects($this->once())
-            ->method('remove')
             ->with($existingRoute);
-
-        $this->routeRepository->expects($this->once())
-            ->method('commit');
 
         $this->findStopsByCityCodesTask->expects($this->once())
             ->method('run')
