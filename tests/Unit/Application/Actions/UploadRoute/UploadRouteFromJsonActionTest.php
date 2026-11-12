@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Actions\UploadRoute;
 
 use App\Application\Actions\UploadRoute\UploadRouteFromJsonAction;
+use App\Application\Events\RouteImportCompletedEvent;
 use App\Application\Tasks\Route\DeleteRouteTask;
 use App\Application\Tasks\Route\FindRouteByShortNameTask;
 use App\Application\Tasks\Stop\FindStopsByCityCodesTask;
@@ -21,6 +22,7 @@ use App\Domain\ValueObjects\ServiceDays;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use ReflectionException;
 use Throwable;
 
@@ -34,6 +36,7 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
     private FindStopsByCityCodesTask|MockObject $findStopsByCityCodesTask;
     private TransactionInterface|MockObject $transaction;
     private DeleteRouteTask|MockObject $deleteRouteTask;
+    private EventDispatcherInterface|MockObject $dispatcher;
 
     private UploadRouteFromJsonAction $action;
 
@@ -48,6 +51,7 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
         $this->findStopsByCityCodesTask = $this->createMock(FindStopsByCityCodesTask::class);
         $this->transaction = $this->createMock(TransactionInterface::class);
         $this->deleteRouteTask = $this->createMock(DeleteRouteTask::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
 
         $this->action = new UploadRouteFromJsonAction(
@@ -58,6 +62,7 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
             $this->findStopsByCityCodesTask,
             $this->transaction,
             $this->deleteRouteTask,
+            $this->dispatcher,
         );
     }
 
@@ -116,6 +121,11 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
         $this->tripRepository->expects($this->once())
             ->method('commit');
 
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(new RouteImportCompletedEvent())
+            ->willReturnArgument(0);
+
         $this->action->run(self::TEST_FILE);
     }
 
@@ -163,6 +173,11 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
 
         $this->tripRepository->expects($this->once())
             ->method('commit');
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(new RouteImportCompletedEvent())
+            ->willReturnArgument(0);
 
         $this->action->run(self::TEST_FILE);
     }
@@ -229,6 +244,11 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
 
         $this->tripRepository->expects($this->once())
             ->method('commit');
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(new RouteImportCompletedEvent())
+            ->willReturnArgument(0);
 
         $this->action->run(self::TEST_FILE);
     }

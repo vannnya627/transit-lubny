@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Listeners;
 
-use App\Domain\Entity\Route\Route;
-use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
+use App\Application\Events\RouteImportCompletedEvent;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-#[AsEntityListener(event: 'prePersist', method: 'invalidate', entity: Route::class)]
-#[AsEntityListener(event: 'preRemove', method: 'invalidate', entity: Route::class)]
-#[AsEntityListener(event: 'preUpdate', method: 'invalidate', entity: Route::class)]
+#[AsEventListener(event: RouteImportCompletedEvent::class, method: 'invalidate')]
 final readonly class RouteCacheInvalidator
 {
     public function __construct(

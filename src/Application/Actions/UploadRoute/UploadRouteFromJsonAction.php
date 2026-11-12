@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\UploadRoute;
 
+use App\Application\Events\RouteImportCompletedEvent;
 use App\Application\Tasks\Route\DeleteRouteTask;
 use App\Application\Tasks\Route\FindRouteByShortNameTask;
 use App\Application\Tasks\Stop\FindStopsByCityCodesTask;
@@ -20,6 +21,7 @@ use App\Domain\ValueObjects\Coordinates;
 use App\Domain\ValueObjects\ServiceDays;
 use App\Domain\ValueObjects\TimeOfDay;
 use LogicException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Throwable;
 
 /**
@@ -37,6 +39,7 @@ final readonly class UploadRouteFromJsonAction
         private FindStopsByCityCodesTask $findStopsByCityCodesTask,
         private TransactionInterface $transaction,
         private DeleteRouteTask $deleteRouteTask,
+        private EventDispatcherInterface $dispatcher,
     ) {}
 
     /**
@@ -58,6 +61,7 @@ final readonly class UploadRouteFromJsonAction
                 }
             },
         );
+        $this->dispatcher->dispatch(new RouteImportCompletedEvent());
     }
 
     /**
