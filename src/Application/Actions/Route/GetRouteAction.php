@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Route;
 
-use App\Application\Caching\RouteCache;
+use App\Application\Caching\RouteCacheInterface;
 use App\Application\DTOs\PatternDTO;
 use App\Application\DTOs\RouteWithPatternsDTO;
 use App\Application\Tasks\Route\GetRouteTask;
@@ -14,13 +14,13 @@ final readonly class GetRouteAction
 {
     public function __construct(
         private GetRouteTask $getRouteTask,
-        private RouteCache $cache,
+        private RouteCacheInterface $cache,
     ) {}
 
     public function run(int $routeId): RouteWithPatternsDTO
     {
-        return $this->cache->get(
-            key: "routes.$routeId",
+        return $this->cache->getRoute(
+            routeId: $routeId,
             callback: function () use ($routeId): RouteWithPatternsDTO {
                 $route = $this->getRouteTask->run($routeId);
 

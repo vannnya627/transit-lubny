@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Stop;
 
-use App\Application\Caching\DepartureCache;
+use App\Application\Caching\DepartureCacheInterface;
 use App\Application\Caching\Keys\GetStopDeparturesCacheKey;
 use App\Application\DTOs\DepartureDTO;
 use App\Application\DTOs\Inputs\GetStopDeparturesInput;
@@ -20,15 +20,15 @@ final readonly class GetStopDeparturesAction
     public function __construct(
         private FindPatternsWithRoutesByIdsTask $findPatternsWithRoutesByIds,
         private GetStopByIdTask $getStopByIdTask,
-        private DepartureCache $cache,
+        private DepartureCacheInterface $cache,
         private FindStopTimesWithTripTask $findStopTimesWithTripTask,
     ) {}
 
     public function run(GetStopDeparturesInput $input): StopWithDeparturesDTO
     {
 
-        return $this->cache->get(
-            key: GetStopDeparturesCacheKey::fromInput($input)->toString(),
+        return $this->cache->getStopDepartures(
+            key: GetStopDeparturesCacheKey::fromInput($input),
             callback: function () use ($input) {
 
                 // todo - тут знаходжу зупинку щоб взяти тільки з неї імя, можливо змінити

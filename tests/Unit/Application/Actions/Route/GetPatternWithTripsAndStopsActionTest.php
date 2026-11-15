@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Actions\Route;
 
 use App\Application\Actions\Route\GetPatternWithTripsAndStopsAction;
-use App\Application\Caching\RouteCache;
+use App\Application\Caching\RouteCacheInterface;
 use App\Application\DTOs\PatternWithStopsAndTripsDTO;
 use App\Application\DTOs\StopForScheduleDTO;
 use App\Application\DTOs\TripDTO;
@@ -30,7 +30,7 @@ class GetPatternWithTripsAndStopsActionTest extends AbstractTestCase
     private GetPatternByIdTask|MockObject $getPatternByIdTask;
     private GetStopsByIdsTask|MockObject $findStopsByIdsTask;
     private FindTripsWithStopTimesByPatternIdTask|MockObject $findTripsWithStopTimesByPatternIdTask;
-    private RouteCache|MockObject $cache;
+    private RouteCacheInterface|MockObject $cache;
     private GetPatternWithTripsAndStopsAction $action;
 
     protected function setUp(): void
@@ -38,7 +38,7 @@ class GetPatternWithTripsAndStopsActionTest extends AbstractTestCase
         $this->getPatternByIdTask = $this->createMock(GetPatternByIdTask::class);
         $this->findStopsByIdsTask = $this->createMock(GetStopsByIdsTask::class);
         $this->findTripsWithStopTimesByPatternIdTask = $this->createMock(FindTripsWithStopTimesByPatternIdTask::class);
-        $this->cache = $this->createMock(RouteCache::class);
+        $this->cache = $this->createMock(RouteCacheInterface::class);
         $this->action = new GetPatternWithTripsAndStopsAction(
             $this->getPatternByIdTask,
             $this->findStopsByIdsTask,
@@ -87,12 +87,9 @@ class GetPatternWithTripsAndStopsActionTest extends AbstractTestCase
         );
 
         $this->cache->expects($this->once())
-            ->method('get')
-            ->willReturnCallback(function (string $key, callable $callback) use ($pattern) {
-                $this->assertEquals("pattern.$pattern->id", $key);
-
-                return $callback();
-            });
+            ->method('getPatternWithStopsAndTrips')
+            ->with($pattern->id)
+            ->willReturnCallback(fn(int $patternId, callable $callback) => $callback());
 
         $this->getPatternByIdTask->expects($this->once())
             ->method('run')

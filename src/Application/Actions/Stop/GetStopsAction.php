@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Actions\Stop;
 
 use App\Application\Caching\Keys\SearchStopsCacheKey;
-use App\Application\Caching\StopCache;
+use App\Application\Caching\StopCacheInterface;
 use App\Application\DTOs\Inputs\SearchStopsInput;
 use App\Application\DTOs\StopDTO;
 use App\Application\Tasks\Stop\FindStopsBySearchQueryTask;
@@ -14,7 +14,7 @@ final readonly class GetStopsAction
 {
     public function __construct(
         private FindStopsBySearchQueryTask $findStopsBySearchQueryTask,
-        private StopCache $cache,
+        private StopCacheInterface $cache,
     ) {}
 
     /**
@@ -23,8 +23,8 @@ final readonly class GetStopsAction
     public function run(SearchStopsInput $input): array
     {
 
-        return $this->cache->get(
-            key: SearchStopsCacheKey::fromInput($input)->toString(),
+        return $this->cache->getStops(
+            key: SearchStopsCacheKey::fromInput($input),
             callback: function () use ($input) {
                 $stops = $this->findStopsBySearchQueryTask->run($input);
 

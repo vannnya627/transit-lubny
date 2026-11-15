@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Actions\Trip;
 
 use App\Application\Actions\Trip\GetTripAction;
-use App\Application\Caching\TripCache;
+use App\Application\Caching\TripCacheInterface;
 use App\Application\DTOs\Inputs\GetTripInput;
 use App\Application\DTOs\RouteDTO;
 use App\Application\DTOs\StopDTO;
@@ -32,7 +32,7 @@ class GetTripActionTest extends AbstractTestCase
     private GetTripByIdTask|MockObject $getTripByIdTask;
     private GetPatternWithRouteByPatternIdTask|MockObject $getPatternWithRouteByPatternIdTask;
     private GetStopsByIdsTask|MockObject $findStopsByIdsTask;
-    private TripCache|MockObject $cache;
+    private TripCacheInterface|MockObject $cache;
     private GetTripAction $action;
 
     protected function setUp(): void
@@ -40,7 +40,7 @@ class GetTripActionTest extends AbstractTestCase
         $this->getTripByIdTask = $this->createMock(GetTripByIdTask::class);
         $this->getPatternWithRouteByPatternIdTask = $this->createMock(GetPatternWithRouteByPatternIdTask::class);
         $this->findStopsByIdsTask = $this->createMock(GetStopsByIdsTask::class);
-        $this->cache = $this->createMock(TripCache::class);
+        $this->cache = $this->createMock(TripCacheInterface::class);
         $this->action = new GetTripAction(
             $this->getTripByIdTask,
             $this->getPatternWithRouteByPatternIdTask,
@@ -88,12 +88,9 @@ class GetTripActionTest extends AbstractTestCase
         );
 
         $this->cache->expects($this->once())
-            ->method('get')
-            ->willReturnCallback(function (string $key, callable $callback) use ($trip) {
-                $this->assertEquals("trip.$trip->id", $key);
-
-                return $callback($trip);
-            });
+            ->method('getTrip')
+            ->with($tripId)
+            ->willReturnCallback(fn(int $tripId, callable $callback) => $callback());
 
         $this->getTripByIdTask->expects($this->once())
             ->method('run')

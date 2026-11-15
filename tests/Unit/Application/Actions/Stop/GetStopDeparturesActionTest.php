@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Actions\Stop;
 
 use App\Application\Actions\Stop\GetStopDeparturesAction;
-use App\Application\Caching\DepartureCache;
+use App\Application\Caching\DepartureCacheInterface;
 use App\Application\Caching\Keys\GetStopDeparturesCacheKey;
 use App\Application\DTOs\DepartureDTO;
 use App\Application\DTOs\Inputs\GetStopDeparturesInput;
@@ -31,7 +31,7 @@ class GetStopDeparturesActionTest extends AbstractTestCase
 {
     private FindPatternsWithRoutesByIdsTask|MockObject $findPatternsWithRoutesByIds;
     private GetStopByIdTask|MockObject $getStopByIdTask;
-    private DepartureCache|MockObject $cache;
+    private DepartureCacheInterface|MockObject $cache;
     private FindStopTimesWithTripTask|MockObject $findStopTimesWithTripTask;
 
     private GetStopDeparturesAction $action;
@@ -40,7 +40,7 @@ class GetStopDeparturesActionTest extends AbstractTestCase
     {
         $this->findPatternsWithRoutesByIds = $this->createMock(FindPatternsWithRoutesByIdsTask::class);
         $this->getStopByIdTask = $this->createMock(GetStopByIdTask::class);
-        $this->cache = $this->createMock(DepartureCache::class);
+        $this->cache = $this->createMock(DepartureCacheInterface::class);
         $this->findStopTimesWithTripTask = $this->createMock(FindStopTimesWithTripTask::class);
         $this->action = new GetStopDeparturesAction(
             $this->findPatternsWithRoutesByIds,
@@ -94,12 +94,9 @@ class GetStopDeparturesActionTest extends AbstractTestCase
         );
 
         $this->cache->expects($this->once())
-            ->method('get')
-            ->willReturnCallback(function (string $key, callable $callback) use ($input) {
-                $this->assertEquals(GetStopDeparturesCacheKey::fromInput($input)->toString(), $key);
-
-                return $callback();
-            });
+            ->method('getStopDepartures')
+            ->with(GetStopDeparturesCacheKey::fromInput($input))
+            ->willReturnCallback(fn(GetStopDeparturesCacheKey $key, callable $callback) => $callback());
 
         $this->getStopByIdTask->expects($this->once())
             ->method('run')

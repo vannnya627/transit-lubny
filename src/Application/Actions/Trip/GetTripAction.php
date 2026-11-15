@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Trip;
 
-use App\Application\Caching\TripCache;
+use App\Application\Caching\TripCacheInterface;
 use App\Application\DTOs\Inputs\GetTripInput;
 use App\Application\DTOs\RouteDTO;
 use App\Application\DTOs\StopDTO;
@@ -22,14 +22,13 @@ final readonly class GetTripAction
         private GetTripByIdTask $getTripByIdTask,
         private GetPatternWithRouteByPatternIdTask $getPatternWithRouteByPatternIdTask,
         private GetStopsByIdsTask $getStopsByIdsTask,
-        private TripCache $cache,
+        private TripCacheInterface $cache,
     ) {}
 
     public function run(GetTripInput $input): TripDetailsDTO
     {
-        /** @var TripDetailsDTO $tripDetailsDTO */
-        $tripDetailsDTO = $this->cache->get(
-            key: "trip.$input->tripId",
+        $tripDetailsDTO = $this->cache->getTrip(
+            tripId: $input->tripId,
             callback: function () use ($input) {
                 $trip = $this->getTripByIdTask->run($input->tripId);
                 $pattern = $this->getPatternWithRouteByPatternIdTask->run($trip->patternId);

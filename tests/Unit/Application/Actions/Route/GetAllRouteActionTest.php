@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Actions\Route;
 
 use App\Application\Actions\Route\GetAllRouteAction;
-use App\Application\Caching\RouteCache;
+use App\Application\Caching\RouteCacheInterface;
 use App\Application\DTOs\RouteDTO;
 use App\Application\Tasks\Route\GetAllRouteTask;
 use App\Domain\Entity\Route\Route;
@@ -18,13 +18,13 @@ use ReflectionException;
 class GetAllRouteActionTest extends AbstractTestCase
 {
     private GetAllRouteTask|MockObject $getAllRouteTask;
-    private RouteCache|MockObject $cache;
+    private RouteCacheInterface|MockObject $cache;
     private GetAllRouteAction $getAllRouteAction;
 
     public function setUp(): void
     {
         $this->getAllRouteTask = $this->createMock(GetAllRouteTask::class);
-        $this->cache = $this->createMock(RouteCache::class);
+        $this->cache = $this->createMock(RouteCacheInterface::class);
 
 
         $this->getAllRouteAction = new GetAllRouteAction(
@@ -43,12 +43,8 @@ class GetAllRouteActionTest extends AbstractTestCase
         $this->setEntityId($route, $routeId);
 
         $this->cache->expects($this->once())
-            ->method('get')
-            ->willReturnCallback(function (string $key, callable $callback) {
-                $this->assertEquals('routes', $key);
-
-                return $callback();
-            });
+            ->method('getAllRoutes')
+            ->willReturnCallback(fn(callable $callback) => $callback());
 
         $this->getAllRouteTask->expects($this->once())
             ->method('run')
@@ -63,12 +59,8 @@ class GetAllRouteActionTest extends AbstractTestCase
     public function testRunWhenRouteDoesNotExist(): void
     {
         $this->cache->expects($this->once())
-            ->method('get')
-            ->willReturnCallback(function (string $key, callable $callback) {
-                $this->assertEquals('routes', $key);
-
-                return $callback();
-            });
+            ->method('getAllRoutes')
+            ->willReturnCallback(fn(callable $callback) => $callback());
 
         $this->getAllRouteTask->expects($this->once())
             ->method('run')

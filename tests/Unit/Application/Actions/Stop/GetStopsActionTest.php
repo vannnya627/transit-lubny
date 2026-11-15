@@ -6,7 +6,7 @@ namespace App\Tests\Unit\Application\Actions\Stop;
 
 use App\Application\Actions\Stop\GetStopsAction;
 use App\Application\Caching\Keys\SearchStopsCacheKey;
-use App\Application\Caching\StopCache;
+use App\Application\Caching\StopCacheInterface;
 use App\Application\DTOs\Inputs\SearchStopsInput;
 use App\Application\DTOs\StopDTO;
 use App\Application\Tasks\Stop\FindStopsBySearchQueryTask;
@@ -21,13 +21,13 @@ use ReflectionException;
 class GetStopsActionTest extends AbstractTestCase
 {
     private FindStopsBySearchQueryTask|MockObject $findStopsBySearchQueryTask;
-    private StopCache|MockObject $cache;
+    private StopCacheInterface|MockObject $cache;
     private GetStopsAction $action;
 
     protected function setUp(): void
     {
         $this->findStopsBySearchQueryTask = $this->createMock(FindStopsBySearchQueryTask::class);
-        $this->cache = $this->createMock(StopCache::class);
+        $this->cache = $this->createMock(StopCacheInterface::class);
         $this->action = new GetStopsAction(
             $this->findStopsBySearchQueryTask,
             $this->cache,
@@ -52,12 +52,9 @@ class GetStopsActionTest extends AbstractTestCase
         $this->setEntityId($stop, $stopId);
 
         $this->cache->expects($this->once())
-            ->method('get')
-            ->willReturnCallback(function (string $key, callable $callback) use ($input) {
-                $this->assertEquals(SearchStopsCacheKey::fromInput($input)->toString(), $key);
-
-                return $callback();
-            });
+            ->method('getStops')
+            ->with(SearchStopsCacheKey::fromInput($input))
+            ->willReturnCallback(fn(SearchStopsCacheKey $key, callable $callback) => $callback());
 
         $this->findStopsBySearchQueryTask->expects($this->once())
             ->method('run')

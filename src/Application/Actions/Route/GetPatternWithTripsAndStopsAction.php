@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Route;
 
-use App\Application\Caching\RouteCache;
+use App\Application\Caching\RouteCacheInterface;
 use App\Application\DTOs\PatternWithStopsAndTripsDTO;
 use App\Application\DTOs\StopForScheduleDTO;
 use App\Application\DTOs\TripDTO;
@@ -19,13 +19,13 @@ final readonly class GetPatternWithTripsAndStopsAction
         private GetPatternByIdTask $getPatternByIdTask,
         private GetStopsByIdsTask $getStopsByIdsTask,
         private FindTripsWithStopTimesByPatternIdTask $findTripsWithStopTimesByPatternIdTask,
-        private RouteCache $cache,
+        private RouteCacheInterface $cache,
     ) {}
 
     public function run(int $patternId): PatternWithStopsAndTripsDTO
     {
-        return $this->cache->get(
-            key: "pattern.$patternId",
+        return $this->cache->getPatternWithStopsAndTrips(
+            patternId: $patternId,
             callback: function () use ($patternId): PatternWithStopsAndTripsDTO {
                 $pattern = $this->getPatternByIdTask->run($patternId);
 
