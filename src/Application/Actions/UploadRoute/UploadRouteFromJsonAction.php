@@ -5,6 +5,12 @@ declare(strict_types=1);
 namespace App\Application\Actions\UploadRoute;
 
 use App\Application\Events\RouteImportCompletedEvent;
+use App\Application\Import\DTOs\PatternImportData;
+use App\Application\Import\DTOs\RouteImportData;
+use App\Application\Import\DTOs\StopImportData;
+use App\Application\Import\DTOs\TripImportData;
+use App\Application\Import\Interfaces\RouteImportFileReaderInterface;
+use App\Application\Import\Interfaces\RouteImportParserInterface;
 use App\Application\Tasks\Route\DeleteRouteTask;
 use App\Application\Tasks\Route\FindRouteByShortNameTask;
 use App\Application\Tasks\Stop\FindStopsByCityCodesTask;
@@ -12,23 +18,15 @@ use App\Domain\Entity\Route\Pattern\Pattern;
 use App\Domain\Entity\Route\Route;
 use App\Domain\Entity\Stop;
 use App\Domain\Entity\Trip\Trip;
-use App\Domain\Enums\Direction;
 use App\Domain\Repositories\Route\RouteRepositoryInterface;
 use App\Domain\Repositories\StopRepositoryInterface;
 use App\Domain\Repositories\TransactionInterface;
 use App\Domain\Repositories\Trip\TripRepositoryInterface;
-use App\Domain\ValueObjects\Coordinates;
 use App\Domain\ValueObjects\ServiceDays;
-use App\Domain\ValueObjects\TimeOfDay;
 use LogicException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Throwable;
 
-/**
- * @phpstan-type StopData array{cityCode?: int|string, lat?: float|string|null, lon?: float|string|null, name?: string}
- * @phpstan-type PatternData array{direction?: int|string, name?: string, stops?: list<StopData>, trips?: list<array{times?: list<string>}>}
- * @phpstan-type RouteData array{shortName: string, longName?: string, patterns?: list<PatternData>}
- */
 final readonly class UploadRouteFromJsonAction
 {
     public function __construct(
@@ -40,6 +38,8 @@ final readonly class UploadRouteFromJsonAction
         private TransactionInterface $transaction,
         private DeleteRouteTask $deleteRouteTask,
         private EventDispatcherInterface $dispatcher,
+        private RouteImportFileReaderInterface $fileReader,
+        private RouteImportParserInterface $parser,
     ) {}
 
     /**
@@ -47,7 +47,10 @@ final readonly class UploadRouteFromJsonAction
      */
     public function run(string $filePath): void
     {
-        $data = $this->getData($filePath);
+        $data = $this->parser->parse(
+            $this->fileReader->read($filePath),
+            $filePath,
+        );
 
         $this->transaction->executeInTransaction(
             function () use ($data): void {
@@ -61,67 +64,40 @@ final readonly class UploadRouteFromJsonAction
                 }
             },
         );
+
         $this->dispatcher->dispatch(new RouteImportCompletedEvent());
     }
 
     /**
-     * @return list<RouteData>
-     */
-    private function getData(string $filePath): array
-    {
-        /** @var list<RouteData> $data */
-        $data = [];
-
-        $jsonContent = file_get_contents($filePath);
-        if (is_string($jsonContent)) {
-            $routesFromFile = json_decode($jsonContent, true);
-            if (is_array($routesFromFile)) {
-                /** @var list<RouteData> $routesFromFile */
-                $data = array_merge($data, $routesFromFile);
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param list<RouteData> $data
+     * @param list<RouteImportData> $data
      *
-     * @return array<int, array{name: string, lat: float, lon: float}>
+     * @return array<int, StopImportData>
      */
     private function getUniqueStops(array $data): array
     {
         $uniqueStops = [];
 
         foreach ($data as $routeData) {
-            $patterns = $routeData['patterns'] ?? [];
+            foreach ($routeData->patterns as $patternData) {
+                foreach ($patternData->stops as $stopData) {
+                    $code = $stopData->cityCode;
 
-            foreach ($patterns as $patternData) {
-                $stops = $patternData['stops'] ?? [];
+                    if (isset($uniqueStops[$code])) {
+                        if ($uniqueStops[$code]->name !== $stopData->name) {
+                            throw new LogicException(sprintf('Колізія cityCode %d: вже прив’язаний до "%s", але маршрут намагається призначити "%s"', $code, $uniqueStops[$code]->name, $stopData->name));
+                        }
 
-                foreach ($stops as $stopData) {
-                    $codeVal = $stopData['cityCode'] ?? 0;
-                    $code = is_numeric($codeVal) ? (int) $codeVal : 0;
+                        if (
+                            0.0 === $uniqueStops[$code]->coordinates->lat
+                            && 0.0 !== $stopData->coordinates->lat
+                        ) {
+                            $uniqueStops[$code] = $stopData;
+                        }
 
-                    $latVal = $stopData['lat'] ?? null;
-                    $lat = is_numeric($latVal) ? (float) $latVal : null;
-
-                    $lonVal = $stopData['lon'] ?? null;
-                    $lon = is_numeric($lonVal) ? (float) $lonVal : null;
-
-                    $name = $stopData['name'] ?? '';
-
-                    if (isset($uniqueStops[$code]) && $uniqueStops[$code]['name'] !== $name) {
-                        throw new LogicException(sprintf('Колізія cityCode %d: вже прив’язаний до "%s", але маршрут намагається призначити "%s"', $code, $uniqueStops[$code]['name'], $name));
+                        continue;
                     }
 
-                    if (!isset($uniqueStops[$code]) || (0.0 !== $lat && null !== $lat)) {
-                        $uniqueStops[$code] = [
-                            'name' => $name,
-                            'lat' => $lat ?? 0.0,
-                            'lon' => $lon ?? 0.0,
-                        ];
-                    }
+                    $uniqueStops[$code] = $stopData;
                 }
             }
         }
@@ -130,14 +106,14 @@ final readonly class UploadRouteFromJsonAction
     }
 
     /**
-     * @param list<RouteData> $data
+     * @param list<RouteImportData> $data
      *
      * @throws Throwable
      */
     private function deleteDuplicateBeforeUpload(array $data): void
     {
         foreach ($data as $routeData) {
-            $route = $this->findRouteByShortNameTask->run($routeData['shortName']);
+            $route = $this->findRouteByShortNameTask->run($routeData->shortName);
 
             if (null !== $route) {
                 $this->deleteRouteTask->run($route);
@@ -146,7 +122,7 @@ final readonly class UploadRouteFromJsonAction
     }
 
     /**
-     * @param array<int, array{name: string, lat: float, lon: float}> $uniqueStops
+     * @param array<int, StopImportData> $uniqueStops
      *
      * @return array<int, Stop>
      */
@@ -168,49 +144,40 @@ final readonly class UploadRouteFromJsonAction
                 continue;
             }
 
-            $lat = $stopInfo['lat'];
-            $lon = $stopInfo['lon'];
-            $name = $stopInfo['name'];
-
-            $stop = Stop::create($name, Coordinates::create($lat, $lon), $code);
+            $stop = Stop::create($stopInfo->name, $stopInfo->coordinates, $code);
 
             $this->stopRepository->save($stop);
             $stopEntities[$code] = $stop;
         }
+
         $this->stopRepository->commit();
 
         return $stopEntities;
     }
 
     /**
-     * @param RouteData        $routeData
      * @param array<int, Stop> $stopEntities
      *
      * @throws Throwable
      */
-    private function processRoute(array $routeData, array $stopEntities): void
+    private function processRoute(RouteImportData $routeData, array $stopEntities): void
     {
-        $shortName = $routeData['shortName'];
-        $longName = $routeData['longName'] ?? '';
+        $route = Route::create($routeData->shortName, $routeData->longName);
 
-        $route = Route::create($shortName, $longName);
-
-        $patternsData = $routeData['patterns'] ?? [];
-        /** @var list<array{pattern: Pattern, trips: list<array{times?: list<string>}>}> $patternsWithTrips */
+        /** @var list<array{pattern: Pattern, trips: list<TripImportData>}> $patternsWithTrips */
         $patternsWithTrips = [];
 
-        foreach ($patternsData as $patternData) {
-            $pattern = $this->createPattern($route, $patternData, $stopEntities);
-
+        foreach ($routeData->patterns as $patternData) {
             $patternsWithTrips[] = [
-                'pattern' => $pattern,
-                'trips' => $patternData['trips'] ?? [],
+                'pattern' => $this->createPattern($route, $patternData, $stopEntities),
+                'trips' => $patternData->trips,
             ];
         }
 
         $this->routeRepository->saveAndCommit($route);
 
         $serviceDays = new ServiceDays(true, true, true, true, true, true, true);
+
         foreach ($patternsWithTrips as $item) {
             $this->createTripsForPattern($item['pattern'], $item['trips'], $serviceDays);
         }
@@ -219,32 +186,22 @@ final readonly class UploadRouteFromJsonAction
     }
 
     /**
-     * @param PatternData      $patternData
      * @param array<int, Stop> $stopEntities
      */
-    private function createPattern(Route $route, array $patternData, array $stopEntities): Pattern
+    private function createPattern(Route $route, PatternImportData $patternData, array $stopEntities): Pattern
     {
-        $dirVal = $patternData['direction'] ?? 0;
-        $directionInt = is_numeric($dirVal) ? (int) $dirVal : 0;
-        $direction = Direction::from($directionInt);
-
-        $patternName = $patternData['name'] ?? '';
-
-        $pattern = $route->createPattern($direction, $patternName);
+        $pattern = $route->createPattern($patternData->direction, $patternData->name);
 
         $sequence = 1;
-        $stops = $patternData['stops'] ?? [];
 
-        foreach ($stops as $stopData) {
-            $codeVal = $stopData['cityCode'] ?? 0;
-            $code = is_numeric($codeVal) ? (int) $codeVal : 0;
+        foreach ($patternData->stops as $stopData) {
+            $stop = $stopEntities[$stopData->cityCode] ?? null;
 
-            if (!isset($stopEntities[$code])) {
-                continue;
+            if (null === $stop) {
+                throw new LogicException(sprintf('Зупинку cityCode %d не знайдено після збереження', $stopData->cityCode));
             }
 
-            $stopId = $stopEntities[$code]->id;
-            $pattern->createPatternStop($sequence, $stopId);
+            $pattern->createPatternStop($sequence, $stop->id);
             ++$sequence;
         }
 
@@ -252,38 +209,42 @@ final readonly class UploadRouteFromJsonAction
     }
 
     /**
-     * @param list<array{times?: list<string>}> $tripsData
+     * @param list<TripImportData> $tripsData
      */
-    private function createTripsForPattern(Pattern $pattern, array $tripsData, ServiceDays $serviceDays): void
-    {
+    private function createTripsForPattern(
+        Pattern $pattern,
+        array $tripsData,
+        ServiceDays $serviceDays,
+    ): void {
         foreach ($tripsData as $tripConfig) {
-            $trip = $this->createSingleTrip($pattern, $tripConfig, $serviceDays);
-            $this->tripRepository->save($trip);
+            $this->tripRepository->save(
+                $this->createSingleTrip($pattern, $tripConfig, $serviceDays),
+            );
         }
     }
 
-    /**
-     * @param array{times?: list<string>} $tripConfig
-     */
-    private function createSingleTrip(Pattern $pattern, array $tripConfig, ServiceDays $serviceDays): Trip
+    private function createSingleTrip(Pattern $pattern, TripImportData $tripConfig, ServiceDays $serviceDays): Trip
     {
         $trip = Trip::create($pattern->id, clone $serviceDays);
         $stopsList = $pattern->patternStops->toArray();
-        $times = $tripConfig['times'] ?? [];
+
+        if (count($tripConfig->times) !== count($stopsList)) {
+            throw new LogicException(sprintf('Кількість часів (%d) не дорівнює кількості зупинок pattern (%d)', count($tripConfig->times), count($stopsList)));
+        }
 
         foreach ($stopsList as $index => $patternStop) {
-            $timeStr = $times[$index] ?? null;
-            if (!is_string($timeStr)) {
+            $time = $tripConfig->times[$index];
+
+            if (null === $time) {
                 continue;
             }
 
-            $stopTime = $trip->createStopTime(
+            $trip->createStopTime(
                 $patternStop->stopSequence,
                 $patternStop->stopId,
-                TimeOfDay::fromString($timeStr),
+                $time,
                 false,
             );
-
         }
 
         return $trip;

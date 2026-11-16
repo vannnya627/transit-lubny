@@ -6,6 +6,13 @@ namespace App\Tests\Unit\Application\Actions\UploadRoute;
 
 use App\Application\Actions\UploadRoute\UploadRouteFromJsonAction;
 use App\Application\Events\RouteImportCompletedEvent;
+use App\Application\Import\DTOs\PatternImportData;
+use App\Application\Import\DTOs\RouteImportData;
+use App\Application\Import\DTOs\StopImportData;
+use App\Application\Import\DTOs\TripImportData;
+use App\Application\Import\Exceptions\InvalidRouteImportException;
+use App\Application\Import\Interfaces\RouteImportFileReaderInterface;
+use App\Application\Import\Interfaces\RouteImportParserInterface;
 use App\Application\Tasks\Route\DeleteRouteTask;
 use App\Application\Tasks\Route\FindRouteByShortNameTask;
 use App\Application\Tasks\Stop\FindStopsByCityCodesTask;
@@ -19,6 +26,7 @@ use App\Domain\Repositories\TransactionInterface;
 use App\Domain\Repositories\Trip\TripRepositoryInterface;
 use App\Domain\ValueObjects\Coordinates;
 use App\Domain\ValueObjects\ServiceDays;
+use App\Domain\ValueObjects\TimeOfDay;
 use App\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -37,6 +45,8 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
     private TransactionInterface|MockObject $transaction;
     private DeleteRouteTask|MockObject $deleteRouteTask;
     private EventDispatcherInterface|MockObject $dispatcher;
+    private RouteImportFileReaderInterface|MockObject $fileReader;
+    private RouteImportParserInterface|MockObject $parser;
 
     private UploadRouteFromJsonAction $action;
 
@@ -52,7 +62,10 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
         $this->transaction = $this->createMock(TransactionInterface::class);
         $this->deleteRouteTask = $this->createMock(DeleteRouteTask::class);
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->fileReader = $this->createMock(RouteImportFileReaderInterface::class);
+        $this->parser = $this->createMock(RouteImportParserInterface::class);
 
+        $this->fileReader->method('read')->willReturn('[]');
 
         $this->action = new UploadRouteFromJsonAction(
             $this->stopRepository,
@@ -63,6 +76,8 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
             $this->transaction,
             $this->deleteRouteTask,
             $this->dispatcher,
+            $this->fileReader,
+            $this->parser,
         );
     }
 
@@ -72,6 +87,11 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
      */
     public function testRun(): void
     {
+
+        $this->parser->expects($this->once())->method('parse')
+            ->with('[]', self::TEST_FILE)
+            ->willReturn([$this->createImportData()]);
+
         $stopId1 = 1;
         $stop1 = Stop::create('Зупинка 1', Coordinates::create(50.042642, 32.942818), 991);
         $this->setEntityId($stop1, $stopId1);
@@ -135,6 +155,11 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
      */
     public function testRunWhenStopsDoNotExist(): void
     {
+
+        $this->parser->expects($this->once())->method('parse')
+            ->with('[]', self::TEST_FILE)
+            ->willReturn([$this->createImportData()]);
+
         $this->transaction->expects($this->once())
             ->method('executeInTransaction')
             ->willReturnCallback(fn(callable $operation) => $operation());
@@ -188,6 +213,11 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
      */
     public function testRunWhenDuplicateRouteExists(): void
     {
+
+        $this->parser->expects($this->once())->method('parse')
+            ->with('[]', self::TEST_FILE)
+            ->willReturn([$this->createImportData()]);
+
         $existingRouteId = 10;
         $existingRoute = Route::create('99', 'Old Route');
         $this->setEntityId($existingRoute, $existingRouteId);
@@ -251,5 +281,45 @@ class UploadRouteFromJsonActionTest extends AbstractTestCase
             ->willReturnArgument(0);
 
         $this->action->run(self::TEST_FILE);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function testRunDoesNotStartTransactionWhenParsingFails(): void
+    {
+        $this->parser->method('parse')
+            ->willThrowException(InvalidRouteImportException::at(self::TEST_FILE, '$', 'bad json'));
+
+        $this->transaction->expects($this->never())->method('executeInTransaction');
+        $this->dispatcher->expects($this->never())->method('dispatch');
+
+        $this->expectException(InvalidRouteImportException::class);
+
+        $this->action->run(self::TEST_FILE);
+    }
+
+    private function createImportData(): RouteImportData
+    {
+        return new RouteImportData(
+            '99',
+            'Тестовий маршрут',
+            [
+                new PatternImportData(
+                    Direction::FORWARD,
+                    'Прямо',
+                    [
+                        new StopImportData(991, 'Зупинка 1', Coordinates::create(50.042642, 32.942818)),
+                        new StopImportData(992, 'Зупинка 2', Coordinates::create(50.038582, 32.940063)),
+                    ],
+                    [
+                        new TripImportData([
+                            TimeOfDay::fromString('08:00'),
+                            TimeOfDay::fromString('08:15'),
+                        ]),
+                    ],
+                ),
+            ],
+        );
     }
 }
