@@ -22,4 +22,9 @@ interface RouteRepositoryInterface
     public function saveAndCommit(Route $route): void;
 
     public function findRouteByShortName(string $shortName): ?Route;
+
+    /**
+     * @return list<Route>
+     */
+    public function findRoutesByStopId(int $stopId): array;
 }

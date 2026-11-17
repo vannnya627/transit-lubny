@@ -7,6 +7,7 @@ namespace App\Infrastructure\Caches;
 use App\Application\Caching\Keys\SearchStopsCacheKey;
 use App\Application\Caching\StopCacheInterface;
 use App\Application\DTOs\StopDTO;
+use App\Application\DTOs\StopWithRoutesDTO;
 use App\Infrastructure\Caches\Abstracts\Cache;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -36,5 +37,10 @@ readonly class StopCache extends Cache implements StopCacheInterface
     public function invalidate(): void
     {
         $this->clear();
+    }
+
+    public function getStopWithRoutes(int $stopId, callable $callback): StopWithRoutesDTO
+    {
+        return $this->get(key: "stop.$stopId.routes", callback: $callback);
     }
 }

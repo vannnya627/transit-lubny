@@ -6,6 +6,7 @@ namespace App\Application\Caching;
 
 use App\Application\Caching\Keys\SearchStopsCacheKey;
 use App\Application\DTOs\StopDTO;
+use App\Application\DTOs\StopWithRoutesDTO;
 
 interface StopCacheInterface
 {
@@ -22,4 +23,9 @@ interface StopCacheInterface
     public function getStops(SearchStopsCacheKey $key, callable $callback): array;
 
     public function invalidate(): void;
+
+    /**
+     * @param callable(): StopWithRoutesDTO $callback
+     */
+    public function getStopWithRoutes(int $stopId, callable $callback): StopWithRoutesDTO;
 }
