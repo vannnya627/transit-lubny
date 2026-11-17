@@ -1,0 +1,99 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Маршрути зупинки: {{ stop.name }} | Лубни{% endblock %}
+
+{% block body %}
+<main class="container" hx-boost="true">
+
+    <nav class="breadcrumbs">
+        <a href="{{ path('web_stop', {id: stop.id}) }}">← ЗУПИНКА: {{ stop.name|upper }}</a>
+        <span> / </span>
+        <a href="{{ path('web_stops') }}">ВСІ ЗУПИНКИ</a>
+        <span> / </span>
+        <a href="{{ path('web_all_routes') }}">МАРШРУТИ</a>
+    </nav>
+
+    <header class="page-header">
+        <span class="badge badge-now">🚏 ЗУПИНКА</span>
+        <h1 style="margin-top: 0.5rem;">{{ stop.name }}</h1>
+        <p class="subtitle">
+            Міські маршрути, що проходять через цю зупинку
+        </p>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+            {% if stop.cityCode %}
+                <span class="badge" style="background: var(--accent-gray);">
+                    #{{ stop.cityCode }}
+                </span>
+            {% endif %}
+
+            {% if stop.coordinates.lat != 0 and stop.coordinates.lon != 0 %}
+                <span class="badge" style="background: var(--accent-gray); font-size: 0.9rem;">
+                    📍 {{ stop.coordinates.lat|round(4) }}, {{ stop.coordinates.lon|round(4) }}
+                </span>
+            {% endif %}
+        </div>
+    </header>
+
+    <div style="margin-bottom: 1rem; font-weight: bold; font-size: 0.9rem;">
+        ЗНАЙДЕНО МАРШРУТІВ: [{{ routes|length }}]
+    </div>
+
+    {% if routes is empty %}
+        <div class="empty-state">
+            <p><strong>[!] Через цю зупинку маршрути не проходять.</strong></p>
+            <div class="btn-group" style="margin-top: 1rem;">
+                <a href="{{ path('web_stop_departures', {id: stop.id}) }}" class="btn btn-white">
+                    ⏱️ НАЙБЛИЖЧІ РЕЙСИ
+                </a>
+                <a href="{{ path('web_stops') }}" class="btn">
+                    ВСІ ЗУПИНКИ
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <section class="route-grid">
+            {% for route in routes %}
+                <a href="{{ path('web_get_route', {id: route.id}) }}" class="route-card">
+                    <div class="route-badge">
+                        № {{ route.shortName }}
+                    </div>
+                    <div class="route-info">
+                        <div class="route-title">
+                            {{ route.longName ?: 'Назва маршруту відсутня' }}
+                        </div>
+                        <small style="text-decoration: underline;">
+                            Розклад та зупинки →
+                        </small>
+                    </div>
+                </a>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    <section class="brut-box" style="margin-top: 1.5rem;">
+        <div style="font-weight: bold; font-size: 0.85rem; margin-bottom: 0.75rem; text-transform: uppercase;">
+            Інші дії
+        </div>
+
+        <div class="btn-group">
+            <a href="{{ path('web_stop_departures', {id: stop.id}) }}" class="btn">
+                ⏱️ НАЙБЛИЖЧІ РЕЙСИ З ЦІЄЇ ЗУПИНКИ
+            </a>
+            <a href="{{ path('web_stop', {id: stop.id}) }}" class="btn btn-white">
+                ℹ️ ІНФО ПРО ЗУПИНКУ
+            </a>
+            {% if stop.coordinates.lat != 0 and stop.coordinates.lon != 0 %}
+                <a href="https://www.openstreetmap.org/?mlat={{ stop.coordinates.lat }}&mlon={{ stop.coordinates.lon }}#map=17/{{ stop.coordinates.lat }}/{{ stop.coordinates.lon }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="btn btn-white">
+                    КАРТА (OPENSTREETMAP) ↗
+                </a>
+            {% endif %}
+        </div>
+    </section>
+
+</main>
+{% endblock %}
