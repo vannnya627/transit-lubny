@@ -25,7 +25,8 @@ class GetStopControllerTest extends AbstractWebTestCase
         $this->assertResponseHeaderSame('content-type', 'text/html; charset=UTF-8');
         $this->assertSelectorTextContains('h1', 'Школа №1');
         $this->assertSelectorTextContains('.page-header', 'МІСЬКИЙ КОД: 42');
-        $this->assertSelectorTextContains('.btn', 'НАЙБЛИЖЧІ РЕЙСИ');
+        $this->assertSelectorExists(sprintf('a[href="/stops/%d/routes"]', $stop->id));
+        $this->assertSelectorExists(sprintf('a[href="/stops/%d/departures"]', $stop->id));
     }
 
     public function testInvokeWhenStopNotFound(): void

@@ -42,7 +42,11 @@
         </div>
 
         <div class="btn-group">
-            <a href="{{ path('web_stop_departures', {id: stop.id}) }}" class="btn">
+            <a href="{{ path('web_stop_with_routes', {id: stop.id}) }}" class="btn">
+                🚌 МАРШРУТИ, ЩО ХОДЯТЬ ТУТ →
+            </a>
+
+            <a href="{{ path('web_stop_departures', {id: stop.id}) }}" class="btn btn-white">
                 ⏱️ НАЙБЛИЖЧІ РЕЙСИ З ЦІЄЇ ЗУПИНКИ →
             </a>
 
