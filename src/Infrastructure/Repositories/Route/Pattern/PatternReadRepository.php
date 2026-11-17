@@ -32,6 +32,10 @@ final class PatternReadRepository extends ServiceEntityRepository implements Pat
      */
     public function findPatternsWithRoutesByIds(array $patternIds): array
     {
+        if ([] === $patternIds) {
+            return [];
+        }
+
         $qb = $this->createQueryBuilder('p')
             ->where('p.id IN (:patternIds)')
             ->join('p.route', 'r')
